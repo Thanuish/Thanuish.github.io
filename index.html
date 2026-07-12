@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thanuish Kumar Sathiaraj — AI · Computer Vision · Agentic Systems</title>
+  <meta name="description" content="Portfolio of Thanuish Kumar Sathiaraj — M.Sc. Computer Science student in Stuttgart building agentic AI systems, computer vision pipelines, and the tools in between. Previously research assistant at the Max Planck Institute for Intelligent Systems.">
+  <style>
+    :root { 
+      --bg: #0b0f19; 
+      --card: #151b2c; 
+      --text: #f0f4f8; 
+      --muted: #8a99ad;
+      --accent: #5c85ff; 
+      --accent-hover: #82a3ff;
+      --line: #222d44; 
+    }
+    @media (prefers-color-scheme: light) {
+      :root { 
+        --bg: #f4f6f9; 
+        --card: #ffffff; 
+        --text: #1e2229; 
+        --muted: #626d7f;
+        --accent: #2b4acb; 
+        --accent-hover: #1d359e;
+        --line: #dbe1ec; 
+      } 
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    
+    body { 
+      background: var(--bg); 
+      color: var(--text); 
+      line-height: 1.6;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .wrap { 
+      max-width: 1000px; 
+      margin: 0 auto; 
+      padding: 60px 24px; 
+    }
+    
+    header {
+      margin-bottom: 48px;
+    }
+    
+    h1 { 
+      font-size: 2.5rem; 
+      letter-spacing: -0.5px; 
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .tagline { 
+      color: var(--accent); 
+      font-weight: 600; 
+      font-size: 1.1rem;
+      margin-bottom: 12px; 
+    }
+    
+    .headline { 
+      color: var(--muted); 
+      max-width: 720px; 
+      font-size: 1.05rem;
+    }
+    
+    .links { 
+      margin-top: 24px; 
+      display: flex; 
+      gap: 12px; 
+      flex-wrap: wrap; 
+    }
+    
+    .links a { 
+      color: var(--text); 
+      text-decoration: none; 
+      border: 1px solid var(--line);
+      padding: 8px 18px; 
+      border-radius: 999px; 
+      font-size: 0.9rem; 
+      font-weight: 500;
+      background: var(--card);
+      transition: all 0.2s ease;
+    }
+    
+    .links a:hover { 
+      border-color: var(--accent); 
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+    
+    h2 { 
+      margin: 56px 0 24px; 
+      font-size: 1.5rem; 
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+    
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+      gap: 20px; 
+    }
+    
+    .card { 
+      background: var(--card); 
+      border: 1px solid var(--line); 
+      border-radius: 14px;
+      padding: 24px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    
+    .card h3 { 
+      font-size: 1.15rem; 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .badge { 
+      font-size: 0.7rem; 
+      padding: 4px 10px; 
+      border-radius: 999px; 
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .badge.dev { 
+      background: color-mix(in srgb, var(--accent) 15%, transparent); 
+      color: var(--accent); 
+    }
+    
+    .sub-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .stack { 
+      color: var(--accent); 
+      font-size: 0.8rem; 
+      font-family: monospace;
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+    
+    .desc { 
+      color: var(--muted); 
+      font-size: 0.9rem; 
+    }
+    
+    .exp { 
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px; 
+      margin-bottom: 16px; 
+      transition: border-color 0.2s ease;
+    }
+    
+    .exp:hover {
+      border-color: var(--accent);
+    }
+    
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    
+    .exp .when { 
+      color: var(--accent); 
+      font-size: 0.85rem; 
+      font-weight: 600;
+    }
+    
+    .chips { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 8px; 
+    }
+    
+    .chip { 
+      border: 1px solid var(--line); 
+      background: var(--card); 
+      border-radius: 999px;
+      padding: 6px 14px; 
+      font-size: 0.85rem; 
+      color: var(--text); 
+      transition: all 0.2s ease;
+    }
+    
+    .chip:hover {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 5%, transparent);
+    }
+    
+    footer { 
+      margin-top: 80px; 
+      color: var(--muted); 
+      font-size: 0.9rem;
+      border-top: 1px solid var(--line); 
+      padding-top: 24px; 
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  
+  <header>
+    <h1>Thanuish Kumar Sathiaraj</h1>
+    <div class="tagline">Agentic AI · Computer Vision · M.Sc. Computer Science @ University of Stuttgart</div>
+    <p class="headline">M.Sc. Computer Science student in Stuttgart building agentic AI systems, computer vision pipelines, and the tools in between. Previously research assistant at the Max Planck Institute for Intelligent Systems.</p>
+    <div class="links">
+      <a href="https://github.com/Thanuish" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/thanuish-kumar-s-a74175212" target="_blank">LinkedIn</a>
+      <a href="mailto:thanuishkumar02@gmail.com">Email</a>
+    </div>
+  </header>
+
+  <h2>Projects</h2>
+  <div class="grid">
+    <div class='card'>
+      <h3>Market Sentinel <span class='badge dev'>in development</span></h3>
+      <div class='sub-title'>Multi-Agent Paper-Trading Research System</div>
+      <div class='stack'>Python, LangGraph, MCP, yfinance, pandas, NumPy, pytest</div>
+      <div class='desc'>Directing an AI coding agent to build a three-agent LangGraph pipeline for simulated trading research: a Watchdog computes deterministic technicals (RSI, MACD) over market data, an Evaluator performs a retrieval-augmented risk check (TF-IDF retrieval over filings/news corpus plus live headlines) with full decision evidence citation.</div>
+    </div>
+    
+    <div class='card'>
+      <h3>VisionARyMenu</h3>
+      <div class='sub-title'>AR Restaurant Menu</div>
+      <div class='stack'>Unity, C#, ARCore, AR Foundation, ARKit, glTFast, ZXing.Net</div>
+      <div class='desc'>Independently ported an iOS/ARKit AR menu application to Android, integrating ARCore and AR Foundation for plane detection and 3D model placement. Built a QR-code-triggered remote menu system decoding table QR codes with ZXing.Net against live camera frames and fetching custom JSON catalogs via UnityWebRequest.</div>
+    </div>
+    
+    <div class='card'>
+      <h3>JOBB HUNTT</h3>
+      <div class='sub-title'>AI-Assisted Job Application System</div>
+      <div class='stack'>HTML/CSS/JS, File System Access API, SheetJS, docx.js, REST APIs</div>
+      <div class='desc'>Directed Claude through iterative spec-writing to build a local-first job-application dashboard reading/writing local Excel and Word files via the browser File System Access API—entirely client-side. Automates pipeline parsing of job postings to generate streamlined tracking documents.</div>
+    </div>
+    
+    <div class='card'>
+      <h3>Multimodal Deepfake Detection</h3>
+      <div class='sub-title'>Video, Audio & Image Pipeline</div>
+      <div class='stack'>Python, OpenCV, TensorFlow, Keras, MTCNN, Inception-ResNet, LSTM, SHAP, Librosa</div>
+      <div class='desc'>Engineered a cascading detection pipeline (MTCNN face detection &rarr; Inception-ResNet feature extraction &rarr; KNN classification) for deepfakes, improving detection accuracy by 12.4% over standalone alternatives. Features an audio deepfake detection module trained on 20+ hours of speech datasets.</div>
+    </div>
+    
+    <div class='card'>
+      <h3>Sentiment Transfer</h3>
+      <div class='sub-title'>Research Project</div>
+      <div class='stack'>Python, Hugging Face Transformers, T5, FLAN-T5, LLaMA 3, Sentence-Transformers</div>
+      <div class='desc'>Fine-tuned T5 and FLAN-T5 models for supervised sentiment transfer; implemented a LLaMA 3 prompt-based in-context learning approach achieving strong polarity-flip performance under low-resource conditions. Constructed a custom parallel dataset of 147 paired reviews.</div>
+    </div>
+    
+    <div class='card'>
+      <h3>Code Grabber</h3>
+      <div class='sub-title'>Floating OCR & Voice Capture Tool</div>
+      <div class='stack'>Python, Tesseract OCR, faster-whisper, Win32 API, PIL</div>
+      <div class='desc'>Built an always-on-top floating desktop assistant offering drag-to-select OCR of on-screen code and offline voice transcription via Whisper large-v3. Generates text injections directly at the cursor using the Win32 SendInput API with a highly modular capture architecture.</div>
+    </div>
+    
+    <div class='card'>
+      <h3>Momentum</h3>
+      <div class='sub-title'>Money & Fitness Tracker (PWA)</div>
+      <div class='stack'>JavaScript, HTML, CSS, Service Worker, localStorage</div>
+      <div class='desc'>Built an installable, fully offline Progressive Web App requiring no backend. Provides seamless expense tracking with custom visualizations, an IOU ledger, and workout logging with reactive styling and robust service-worker caching.</div>
+    </div>
+    
+    <div class='card'>
+      <h3>Helmet & License Plate Detection</h3>
+      <div class='sub-title'>Computer Vision Pipeline</div>
+      <div class='stack'>YOLOv6, Python, OpenCV, Tesseract/EasyOCR</div>
+      <div class='desc'>Trained and deployed YOLOv6 for multi-class real-time object detection tracking motorcycles, riders, and helmet status. Created an optimized ROI-cropping and OCR pipeline for license-plate extraction designed to perform reliably in real-world environmental conditions.</div>
+    </div>
+    
+    <div class='card'>
+      <h3>Academic Collocation Query Tool</h3>
+      <div class='sub-title'>Data Engineering Project</div>
+      <div class='stack'>Python, SQL, SQLite, XSLT, XML, BeautifulSoup</div>
+      <div class='desc'>Building a searchable academic-collocation database transforming Sketch Engine XML output with XSLT, scraping/cleaning HTML academic texts, and structuring data into an optimized SQLite relational database for rapid word and part-of-speech queries.</div>
+    </div>
+  </div>
+
+  <h2>Experience</h2>
+  <div class='exp'>
+    <div class="exp-header">
+      <strong>Student Research Assistant — Computer Vision</strong>
+      <span class='when'>Nov 2025 – Apr 2026</span>
+    </div>
+    <div style="font-size: 0.9rem; margin-bottom: 6px; color: var(--accent);">Max Planck Institute for Intelligent Systems (Perceiving Systems Dept.) · Tübingen, Germany</div>
+    <div class='desc'>Calibrated and operated a multi-camera motion-capture system (Vicon Nexus) under marker-based protocols, ensuring high-fidelity motion tracking data for 3D body reconstruction research. Operated and managed a 4D body scanner for full-body captures.</div>
+  </div>
+  
+  <div class='exp'>
+    <div class="exp-header">
+      <strong>Machine Learning Engineer Intern</strong>
+      <span class='when'>Apr 2024 – Sep 2024</span>
+    </div>
+    <div style="font-size: 0.9rem; margin-bottom: 6px; color: var(--accent);">Shiash Info-Solutions · Chennai, India</div>
+    <div class='desc'>Developed an end-to-end convolutional neural network (CNN) image-classification pipeline in Python (TensorFlow/Keras), from data collection and cleaning through evaluation. Delivered the system independently under senior guidance and automated standard reporting workflows.</div>
+  </div>
+
+  <h2>Skills</h2>
+  <div class="chips">
+    <span class='chip'>Python</span><span class='chip'>SQL</span><span class='chip'>Bash</span><span class='chip'>JavaScript</span><span class='chip'>C#</span>
+    <span class='chip'>TensorFlow</span><span class='chip'>Keras</span><span class='chip'>PyTorch</span><span class='chip'>Scikit-learn</span>
+    <span class='chip'>Hugging Face Transformers</span><span class='chip'>LLM Fine-tuning (T5, FLAN-T5, LLaMA 3)</span>
+    <span class='chip'>OpenCV</span><span class='chip'>MTCNN</span><span class='chip'>Inception-ResNet</span><span class='chip'>YOLOv6</span><span class='chip'>OCR (Tesseract/EasyOCR)</span>
+    <span class='chip'>SMPL-X Body Model</span><span class='chip'>Multi-Camera Systems</span><span class='chip'>Camera Calibration</span>
+    <span class='chip'>Keypoint Tracking</span><span class='chip'>3D Reconstruction</span><span class='chip'>Vicon Nexus</span><span class='chip'>Unity</span>
+    <span class='chip'>Pandas</span><span class='chip'>NumPy</span><span class='chip'>Power BI</span><span class='chip'>Databricks</span><span class='chip'>PySpark</span>
+    <span class='chip'>Docker</span><span class='chip'>Git/GitHub</span><span class='chip'>Linux</span>
+  </div>
+
+  <footer>
+    Stuttgart, Germany · English (C1) · German (A2, improving) · Tamil (native)
+    <br><br>
+    <strong>Open to Werkstudent and internship roles in AI, computer vision, and data.</strong>
+  </footer>
+</div>
+</body>
+</html>
