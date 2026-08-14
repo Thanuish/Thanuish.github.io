@@ -5,5 +5,8 @@ dist
 .VSCodeCounter
 .env*
 .autosave
+.tools
+.claude
+MASTER_REFERENCE_AllWork.md
 .wav
 !static/sounds/music/*.wav

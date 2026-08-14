@@ -1,10 +1,7 @@
 export default [
-    { name: 'X', url: 'https://x.com/bruno_simon', align: 'right' },
-    { name: 'Bluesky', url: 'https://bsky.app/profile/bruno-simon.bsky.social', align: 'right' },
-    { name: 'Youtube', url: 'https://www.youtube.com/@BrunoSimon', align: 'right' },
-    { name: 'Mail', url: 'mailto:simon.bruno.77@gmail.com', align: 'right' },
-    { name: 'Twitch', url: 'https://www.twitch.tv/bruno_simon_dev', align: 'right' },
-    { name: 'GitHub', url: 'https://github.com/brunosimon', align: 'right' },
-    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/simonbruno77/', align: 'left' },
-    { name: 'Discord', modal: 'discord', align: 'left' },
+    { name: 'GitHub', url: 'https://github.com/Thanuish', align: 'right' },
+    { name: 'LinkedIn', url: 'https://linkedin.com/in/thanuish-kumar-s-a74175212', align: 'right' },
+    { name: 'Mail', url: 'mailto:thanuishkumar02@gmail.com', align: 'right' },
+    { name: 'Résumé', modal: 'cv', align: 'left' },
+    { name: 'Site', url: 'https://thanuish.github.io', align: 'left' },
 ]
