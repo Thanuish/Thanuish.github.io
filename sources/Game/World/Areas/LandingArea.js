@@ -5,9 +5,24 @@ import { InteractivePoints } from '../../InteractivePoints.js'
 import { Area } from './Area.js'
 import gsap from 'gsap'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
+import { createLetters, createTextGeometry } from '../../utilities/text3D.js'
 
 export class LandingArea extends Area
 {
+    static NAME = 'THANUISH'
+    static LETTER_SIZE = 1.45
+    static LETTER_DEPTH = 0.46
+    static LETTER_SPACING = 0.16
+    static ACCENT_COLOR = '#5fd2ff'
+
+    // Kept to plain ASCII on purpose: the extruded typeface has no glyph for
+    // typographic separators like the middle dot.
+    static SIGNBOARD_LINES = [
+        { text: 'AI / COMPUTER VISION / 3D PERCEPTION', size: 0.40, elevation: 4.05 },
+        { text: 'M.SC. COMPUTER SCIENCE, STUTTGART', size: 0.30, elevation: 3.35 },
+        { text: 'EXPLORE THE RESEARCH CAMPUS', size: 0.26, elevation: 2.80 },
+    ]
+
     constructor(model)
     {
         super(model)
@@ -15,6 +30,7 @@ export class LandingArea extends Area
         this.localTime = uniform(0)
 
         this.setLetters()
+        this.setSignboard()
         this.setKiosk()
         this.setControls()
         this.setBonfire()
@@ -34,6 +50,118 @@ export class LandingArea extends Area
             {
                 this.game.audio.groups.get('hitBrick').playRandomNext(force, position)
             }
+        }
+
+        this.replaceLetters(references, LandingArea.NAME)
+    }
+
+    /**
+     * The world ships ten baked letter meshes spelling the original owner's
+     * name. Rather than adding a parallel object system, the existing dynamic
+     * bodies are reused: each one gets a regenerated glyph, a resized collider
+     * and a new position along the same row. Surplus slots are disabled.
+     */
+    async replaceLetters(references, text)
+    {
+        if(references.length === 0)
+            return
+
+        // The row axis is baked into the model: derive it from the first and
+        // last letter so the new word sits exactly where the old one did.
+        const first = references[0].position.clone()
+        const last = references[references.length - 1].position.clone()
+        const center = first.clone().add(last).multiplyScalar(0.5)
+        const axis = last.clone().sub(first).setY(0).normalize()
+        const rotationY = references[0].rotation.y
+        const elevation = first.y
+
+        // Hide everything up front so a slow font load never shows the old name.
+        for(const reference of references)
+            reference.visible = false
+
+        const { letters } = await createLetters(text, {
+            size: LandingArea.LETTER_SIZE,
+            depth: LandingArea.LETTER_DEPTH,
+            letterSpacing: LandingArea.LETTER_SPACING
+        })
+
+        if(letters.length > references.length)
+            console.warn(`LandingArea: "${text}" needs ${letters.length} letter slots but only ${references.length} exist.`)
+
+        for(let i = 0; i < references.length; i++)
+        {
+            const reference = references[i]
+            const object = reference.userData.object
+            const letter = letters[i]
+
+            // Surplus slot: park it out of play instead of destroying the body,
+            // so the shared reset/respawn logic keeps working untouched.
+            if(!letter || !letter.geometry)
+            {
+                reference.visible = false
+                object.physical.body.setEnabled(false)
+                continue
+            }
+
+            reference.geometry.dispose()
+            reference.geometry = letter.geometry
+            reference.visible = true
+
+            // Letters run along the axis in reverse: index 0 sits at the far
+            // end of the row, so the word reads correctly from the viewer side.
+            const position = center.clone().addScaledVector(axis, - letter.offset)
+            position.y = elevation
+
+            object.physical.body.setTranslation(position, true)
+            object.physical.body.setRotation(
+                new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotationY),
+                true
+            )
+            object.physical.colliders[0].setHalfExtents({
+                x: letter.width / 2,
+                y: letter.height / 2,
+                z: letter.depth / 2
+            })
+            object.physical.body.wakeUp()
+
+            reference.position.copy(position)
+            reference.needsUpdate = true
+        }
+    }
+
+    /**
+     * Discipline and location lines floating above the name. Purely visual, so
+     * they skip the physics pipeline, but they join the area's hideable list to
+     * be culled with everything else when the area leaves the view.
+     */
+    async setSignboard()
+    {
+        const references = this.references.items.get('letters')
+
+        if(!references || references.length === 0)
+            return
+
+        const first = references[0].position.clone()
+        const last = references[references.length - 1].position.clone()
+        const center = first.clone().add(last).multiplyScalar(0.5)
+        const rotationY = references[0].rotation.y
+
+        const material = new THREE.MeshBasicNodeMaterial()
+        material.outputNode = vec4(color(LandingArea.ACCENT_COLOR).mul(1.9), 1)
+
+        for(const line of LandingArea.SIGNBOARD_LINES)
+        {
+            const geometry = await createTextGeometry(line.text, { size: line.size, depth: 0.06, curveSegments: 3 })
+
+            const mesh = new THREE.Mesh(geometry, material)
+            mesh.position.copy(center)
+            mesh.position.y = line.elevation
+            mesh.rotation.y = rotationY
+            mesh.castShadow = false
+            mesh.receiveShadow = false
+
+            this.game.scene.add(mesh)
+            this.objects.hideable.push(mesh)
         }
     }
 
