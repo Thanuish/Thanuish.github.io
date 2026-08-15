@@ -8,6 +8,8 @@ import { View } from '../../View.js'
 
 export class SocialArea extends Area
 {
+    static LABEL_ELEVATION = 1.1
+
     constructor(model)
     {
         super(model)
@@ -24,8 +26,9 @@ export class SocialArea extends Area
         }
 
         this.setLinks()
+        // Fans are still built so reset/respawn keeps working, but the joke
+        // interaction that spawned them is not part of this portfolio.
         this.setFans()
-        this.setOnlyFans()
         this.setStatue()
         // this.setFWA()
         this.setAchievement()
@@ -33,21 +36,41 @@ export class SocialArea extends Area
 
     setLinks()
     {
-        const radius = 6
-        let i = 0
+        // Area.setObjects reparents every child onto the scene, so the model is
+        // already empty by now. Read the sculptures off the objects it created
+        // instead. Names have had their "PhysicalDynamic" suffix stripped and
+        // may carry a trailing Blender index, so match on prefix.
+        const sculptures = new Map()
+        for(const object of this.objects.items)
+        {
+            const name = object.visual?.object3D?.name
+
+            if(name)
+                sculptures.set(name.replace(/[0-9]+$/, '').toLowerCase(), object.visual.object3D)
+        }
 
         for(const link of socialData)
         {
-            const angle = i * Math.PI / (socialData.length - 1)
-            const position = this.center.clone()
-            position.x += Math.cos(angle) * radius
-            position.y = 1
-            position.z -= Math.sin(angle) * radius
+            const sculpture = sculptures.get(link.target.toLowerCase())
+
+            if(!sculpture)
+            {
+                console.warn(`SocialArea: no sculpture named "${link.target}" in the model.`)
+                continue
+            }
+
+            // Sculptures are dynamic bodies, so read the spawn position once
+            // rather than tracking it. A knocked-over logo keeps its marker.
+            const position = sculpture.position.clone()
+            position.y = SocialArea.LABEL_ELEVATION
+
+            // Put the label on the outward side so it never crosses the statue.
+            const align = position.x < this.center.x ? InteractivePoints.ALIGN_LEFT : InteractivePoints.ALIGN_RIGHT
 
             this.interactivePoint = this.game.interactivePoints.create(
                 position,
                 link.name,
-                link.align === 'left' ? InteractivePoints.ALIGN_LEFT : InteractivePoints.ALIGN_RIGHT,
+                align,
                 InteractivePoints.STATE_CONCEALED,
                 () =>
                 {
@@ -74,8 +97,6 @@ export class SocialArea extends Area
                     this.game.inputs.interactiveButtons.removeItems(['interact'])
                 }
             )
-            
-            i++
         }
     }
 

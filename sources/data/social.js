@@ -1,14 +1,22 @@
 /**
  * Links around the statue.
  *
- * The three live links sit next to each other so they read as one group.
- * The remaining slots are placeholders: they keep the arrangement balanced
- * and are marked as inactive rather than pointing anywhere.
+ * `target` is the name of the logo sculpture in the world model that each
+ * entry belongs to. The original code spaced these evenly around a circle,
+ * which put the labels nowhere near the logos they described. Anchoring to
+ * the sculpture keeps the two in sync no matter how the model is arranged.
+ *
+ * Order here is reading order across the plaza: LinkedIn, GitHub, Mail are the
+ * live links and sit together. The rest are platforms I am not on yet, so they
+ * are inert and say so.
  */
 export default [
-    { name: 'LinkedIn', url: 'https://linkedin.com/in/thanuish-kumar-s-a74175212', align: 'right' },
-    { name: 'GitHub', url: 'https://github.com/Thanuish', align: 'right' },
-    { name: 'Mail', url: 'mailto:thanuishkumar02@gmail.com', align: 'right' },
-    { name: 'Résumé', modal: 'cv', align: 'left' },
-    { name: 'More soon', soon: true, align: 'left' },
+    { name: 'LinkedIn', target: 'linkedIn', url: 'https://linkedin.com/in/thanuish-kumar-s-a74175212' },
+    { name: 'GitHub', target: 'gitHub', url: 'https://github.com/Thanuish' },
+    { name: 'Mail', target: 'mail', url: 'mailto:thanuishkumar02@gmail.com' },
+    { name: 'Résumé', target: 'discord', modal: 'cv' },
+    { name: 'Coming soon', target: 'x', soon: true },
+    { name: 'Coming soon', target: 'youtube', soon: true },
+    { name: 'Coming soon', target: 'twitch', soon: true },
+    { name: 'Coming soon', target: 'bluesky', soon: true },
 ]
