@@ -20,8 +20,8 @@ export class AiLabArea extends ProceduralArea
     static ACCENT = '#b65fff'
     static RADIUS = 10.5
 
-    static NODE_SPACING = 4.1
-    static NODE_HEIGHT = 2.2
+    static NODE_SPACING = 5.4
+    static NODE_HEIGHT = 4.2
 
     static createModel()
     {
@@ -35,7 +35,7 @@ export class AiLabArea extends ProceduralArea
         this.addDeck(AiLabArea.RADIUS)
         this.setPipeline()
         this.setGate()
-        this.addSign([ 'AI / LLM LAB', 'MARKET SENTINEL' ], { elevation: 5.4, spacing: 0.62, size: 0.5 })
+        this.addSign([ 'AI / LLM LAB', 'MARKET SENTINEL' ], { elevation: 8.2, spacing: 1.15, size: 1.05 })
         this.setPoints()
     }
 
@@ -48,8 +48,8 @@ export class AiLabArea extends ProceduralArea
         this.nodes = []
 
         const blockedMaterial = this.createEmissiveMaterial('#4a4560', 1.2)
-        const pillarGeometry = new THREE.CylinderGeometry(0.62, 0.72, AiLabArea.NODE_HEIGHT, 8)
-        const capGeometry = new THREE.CylinderGeometry(0.78, 0.62, 0.18, 8)
+        const pillarGeometry = new THREE.CylinderGeometry(0.95, 1.12, AiLabArea.NODE_HEIGHT, 8)
+        const capGeometry = new THREE.CylinderGeometry(1.22, 0.95, 0.3, 8)
 
         aiLabData.forEach((entry, index) =>
         {
@@ -63,14 +63,14 @@ export class AiLabArea extends ProceduralArea
 
             // The executor sits past the gate, so it reads as unpowered.
             const cap = new THREE.Mesh(capGeometry, entry.blocked ? blockedMaterial : this.materials.accent)
-            cap.position.set(0, 0.3 + AiLabArea.NODE_HEIGHT + 0.09, z)
+            cap.position.set(0, 0.3 + AiLabArea.NODE_HEIGHT + 0.15, z)
             this.group.add(cap)
 
             // Conduit to the next node, except where the gate breaks the chain.
             if(index < aiLabData.length - 1 && !entry.gateAfter)
             {
                 const conduit = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.1, 0.1, AiLabArea.NODE_SPACING - 1.4),
+                    new THREE.BoxGeometry(0.16, 0.16, AiLabArea.NODE_SPACING - 2.3),
                     this.materials.accent
                 )
                 conduit.position.set(0, 0.3 + AiLabArea.NODE_HEIGHT * 0.62, z + AiLabArea.NODE_SPACING / 2)
@@ -101,24 +101,24 @@ export class AiLabArea extends ProceduralArea
         for(const side of [ -1, 1 ])
         {
             const post = new THREE.Mesh(
-                new THREE.BoxGeometry(0.18, 3.0, 0.18),
+                new THREE.BoxGeometry(0.3, 5.2, 0.3),
                 this.materials.structure
             )
-            post.position.set(side * 1.5, 1.5, 0)
+            post.position.set(side * 2.4, 2.6, 0)
             post.castShadow = true
             frame.add(post)
         }
 
-        const lintel = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.2, 0.2), this.materials.structure)
-        lintel.position.y = 3.0
+        const lintel = new THREE.Mesh(new THREE.BoxGeometry(5.1, 0.32, 0.32), this.materials.structure)
+        lintel.position.y = 5.2
         frame.add(lintel)
 
         // Bars, closed. This is the assertion the project makes.
         const barMaterial = this.createEmissiveMaterial('#ff5f7a', 1.7)
-        for(let i = 0; i < 5; i++)
+        for(let i = 0; i < 7; i++)
         {
-            const bar = new THREE.Mesh(new THREE.BoxGeometry(2.9, 0.09, 0.09), barMaterial)
-            bar.position.y = 0.6 + i * 0.52
+            const bar = new THREE.Mesh(new THREE.BoxGeometry(4.7, 0.15, 0.15), barMaterial)
+            bar.position.y = 0.7 + i * 0.62
             frame.add(bar)
         }
 
@@ -131,7 +131,7 @@ export class AiLabArea extends ProceduralArea
         {
             const z = (index - (aiLabData.length - 1) / 2) * AiLabArea.NODE_SPACING
 
-            this.addPoint({ x: 1.9, z }, entry.label, () =>
+            this.addPoint({ x: 2.6, z }, entry.label, () =>
             {
                 openInfoPage(this.game, {
                     role: entry.role,

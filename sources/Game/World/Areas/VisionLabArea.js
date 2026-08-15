@@ -18,8 +18,8 @@ export class VisionLabArea extends ProceduralArea
     static RADIUS = 10
 
     static CAMERA_COUNT = 6
-    static CAMERA_RING_RADIUS = 8.2
-    static CAMERA_HEIGHT = 3.4
+    static CAMERA_RING_RADIUS = 8.6
+    static CAMERA_HEIGHT = 5.2
 
     static createModel()
     {
@@ -37,7 +37,7 @@ export class VisionLabArea extends ProceduralArea
         this.setScanner()
         this.setBody()
         this.setWorkstation()
-        this.addSign([ 'COMPUTER VISION', '3D PERCEPTION LAB' ], { elevation: 5.4, spacing: 0.62, size: 0.5 })
+        this.addSign([ 'COMPUTER VISION', '3D PERCEPTION LAB' ], { elevation: 8.2, spacing: 1.15, size: 1.05 })
         this.setPoints()
     }
 
@@ -48,9 +48,9 @@ export class VisionLabArea extends ProceduralArea
     {
         this.cameras = []
 
-        const postGeometry = new THREE.CylinderGeometry(0.07, 0.09, VisionLabArea.CAMERA_HEIGHT, 6)
-        const bodyGeometry = new THREE.BoxGeometry(0.42, 0.32, 0.62)
-        const lensGeometry = new THREE.CylinderGeometry(0.13, 0.16, 0.18, 10)
+        const postGeometry = new THREE.CylinderGeometry(0.13, 0.17, VisionLabArea.CAMERA_HEIGHT, 6)
+        const bodyGeometry = new THREE.BoxGeometry(0.78, 0.6, 1.15)
+        const lensGeometry = new THREE.CylinderGeometry(0.24, 0.3, 0.32, 10)
 
         for(let i = 0; i < VisionLabArea.CAMERA_COUNT; i++)
         {
@@ -75,7 +75,7 @@ export class VisionLabArea extends ProceduralArea
 
             const lens = new THREE.Mesh(lensGeometry, this.materials.accent)
             lens.rotation.x = Math.PI / 2
-            lens.position.z = 0.38
+            lens.position.z = 0.72
             head.add(lens)
 
             this.cameras.push(head)
@@ -89,10 +89,10 @@ export class VisionLabArea extends ProceduralArea
     setScanner()
     {
         const base = new THREE.Mesh(
-            new THREE.CylinderGeometry(2.4, 2.6, 0.32, 24),
+            new THREE.CylinderGeometry(3.1, 3.35, 0.5, 24),
             this.materials.structure
         )
-        base.position.y = 0.46
+        base.position.y = 0.55
         base.receiveShadow = true
         base.castShadow = true
         this.group.add(base)
@@ -102,11 +102,11 @@ export class VisionLabArea extends ProceduralArea
         for(let i = 0; i < 3; i++)
         {
             const ring = new THREE.Mesh(
-                new THREE.TorusGeometry(2.1, 0.03, 6, 40),
+                new THREE.TorusGeometry(2.8, 0.055, 6, 40),
                 this.materials.accent
             )
             ring.rotation.x = Math.PI / 2
-            ring.position.y = 0.7 + i * 0.9
+            ring.position.y = 0.9 + i * 1.5
             this.group.add(ring)
             this.scanRings.push(ring)
         }
@@ -158,11 +158,12 @@ export class VisionLabArea extends ProceduralArea
         const geometry = new THREE.BufferGeometry()
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
 
-        const material = new THREE.PointsNodeMaterial({ size: 0.05, sizeAttenuation: true })
+        const material = new THREE.PointsNodeMaterial({ size: 0.075, sizeAttenuation: true })
         material.outputNode = this.materials.accent.outputNode
 
         this.body = new THREE.Points(geometry, material)
-        this.body.position.y = 0.62
+        this.body.scale.setScalar(1.55)
+        this.body.position.y = 0.85
         this.group.add(this.body)
 
         this.bodyPointCount = positions.length / 3
@@ -230,8 +231,8 @@ export class VisionLabArea extends ProceduralArea
                 const ring = this.scanRings[i]
                 ring.position.y += delta * 0.6
 
-                if(ring.position.y > 3.4)
-                    ring.position.y = 0.7
+                if(ring.position.y > 5.4)
+                    ring.position.y = 0.9
             }
         }
     }

@@ -1,8 +1,10 @@
 .project
-    .content
-        max-width 46rem
-        width calc(100vw - 4rem)
-        max-height calc(100vh - 6rem)
+    // modals.styl sizes .modal .content with a more specific selector, so the
+    // full chain is needed here or the panel collapses to its content width.
+    > .container > .content
+        width calc(100vw - 6rem)
+        max-width 44rem
+        max-height calc(100vh - 8rem)
         display flex
         flex-direction column
 
