@@ -23,6 +23,19 @@ export class LandingArea extends Area
         { text: 'EXPLORE THE RESEARCH CAMPUS', size: 0.26, elevation: 2.80 },
     ]
 
+    static SIGNPOST_POSITION = { x: 42.5, y: 0, z: 35.6 }
+    static SIGNPOST_HEIGHT = 3.2
+    static SIGNPOST_ARM_LENGTH = 1.9
+
+    // Area centres taken from the world model, so the arms point at the real
+    // thing rather than depending on other areas having been built first.
+    static SIGNPOST_TARGETS = [
+        { label: 'PROJECTS', x: 35.76, z: 13.41 },
+        { label: 'LAB', x: 13.14, z: 17.68 },
+        { label: 'CAREER', x: 25.84, z: -0.90 },
+        { label: 'CONTACT', x: 28.90, z: -21.80 },
+    ]
+
     constructor(model)
     {
         super(model)
@@ -31,6 +44,7 @@ export class LandingArea extends Area
 
         this.setLetters()
         this.setSignboard()
+        this.setSignpost()
         this.setKiosk()
         this.setControls()
         this.setBonfire()
@@ -162,6 +176,65 @@ export class LandingArea extends Area
 
             this.game.scene.add(mesh)
             this.objects.hideable.push(mesh)
+        }
+    }
+
+    /**
+     * A signpost by the spawn with one arm per area, each rotated to actually
+     * point at it. Without this the world gives a first-time visitor no reason
+     * to pick one direction over another.
+     */
+    async setSignpost()
+    {
+        const origin = LandingArea.SIGNPOST_POSITION
+
+        const group = new THREE.Group()
+        group.position.set(origin.x, origin.y, origin.z)
+        this.game.scene.add(group)
+        this.objects.hideable.push(group)
+
+        const woodMaterial = new THREE.MeshLambertNodeMaterial({ color: 0x6b5b4a })
+        const textMaterial = new THREE.MeshBasicNodeMaterial()
+        textMaterial.outputNode = vec4(color(LandingArea.ACCENT_COLOR).mul(1.9), 1)
+
+        // Post
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, LandingArea.SIGNPOST_HEIGHT, 8), woodMaterial)
+        post.position.y = LandingArea.SIGNPOST_HEIGHT / 2
+        post.castShadow = true
+        post.receiveShadow = true
+        group.add(post)
+
+        const armGeometry = new THREE.BoxGeometry(LandingArea.SIGNPOST_ARM_LENGTH, 0.4, 0.07)
+        const tipGeometry = new THREE.ConeGeometry(0.26, 0.36, 4)
+
+        let index = 0
+        for(const target of LandingArea.SIGNPOST_TARGETS)
+        {
+            const arm = new THREE.Group()
+            arm.position.y = LandingArea.SIGNPOST_HEIGHT - 0.45 - index * 0.55
+
+            // Rotation that maps the arm's local +X onto the direction of travel.
+            arm.rotation.y = Math.atan2(- (target.z - origin.z), target.x - origin.x)
+
+            const plank = new THREE.Mesh(armGeometry, woodMaterial)
+            plank.position.x = LandingArea.SIGNPOST_ARM_LENGTH / 2
+            plank.castShadow = true
+            plank.receiveShadow = true
+            arm.add(plank)
+
+            const tip = new THREE.Mesh(tipGeometry, woodMaterial)
+            tip.position.x = LandingArea.SIGNPOST_ARM_LENGTH + 0.14
+            tip.rotation.z = - Math.PI / 2
+            tip.castShadow = true
+            arm.add(tip)
+
+            const geometry = await createTextGeometry(target.label, { size: 0.22, depth: 0.03, curveSegments: 3 })
+            const label = new THREE.Mesh(geometry, textMaterial)
+            label.position.set(LandingArea.SIGNPOST_ARM_LENGTH / 2, 0, 0.06)
+            arm.add(label)
+
+            group.add(arm)
+            index++
         }
     }
 
