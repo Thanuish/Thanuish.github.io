@@ -1,5 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from './Game.js'
+import routes from '../data/routes.js'
 
 /**
  * Drives the car to an area on its own.
@@ -22,11 +23,17 @@ export class Autopilot
     static WIDE_ANGLE = 1.0
 
     static ARRIVE_DISTANCE = 6
+
+    // Waypoints are passed through, not stopped at, so they clear sooner.
+    static WAYPOINT_DISTANCE = 4
     static SLOW_DISTANCE = 16
 
     // If it fails to cover ground for this long, assume it is wedged.
     static STUCK_SECONDS = 4
     static STUCK_SPEED = 1.5
+
+    // Distance between recorded waypoints.
+    static SAMPLE_SPACING = 4
 
     constructor()
     {
@@ -40,13 +47,19 @@ export class Autopilot
         this.forward2D = new THREE.Vector2()
         this.toTarget2D = new THREE.Vector2()
 
+        // Order must be an integer: Events.on uses it as an array index, so a
+        // fractional value becomes a string key and is iterated after every
+        // integer order, which put this after the physics pass instead of
+        // before it. Player registers at 1 first and the vehicle reads at 2,
+        // so sharing order 1 lands this between them.
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
-        }, 1.5)
+        }, 1)
 
         this.watchForManualInput()
         this.setChooser()
+        this.setRecorder()
     }
 
     /**
@@ -159,7 +172,15 @@ export class Autopilot
         if(!destination)
             return false
 
-        this.target = destination.position
+        // Follow the recorded road when there is one, so the car stays on the
+        // paving instead of cutting across whatever lies between.
+        const route = routes[name] ?? []
+        this.waypoints = route.map(([ x, z ]) => new THREE.Vector3(x, 0, z))
+        this.waypoints.push(destination.position.clone())
+
+        this.waypointIndex = 0
+        this.target = this.waypoints[0]
+        this.finalTarget = destination.position
         this.targetName = destination.label
         this.stuckFor = 0
 
@@ -201,8 +222,56 @@ export class Autopilot
         }
     }
 
+    /**
+     * Records a route by driving it. R starts and stops; positions are sampled
+     * every few units and dumped ready to paste into data/routes.js.
+     */
+    setRecorder()
+    {
+        this.recording = null
+
+        window.addEventListener('keydown', (event) =>
+        {
+            if(event.key !== 'r' && event.key !== 'R')
+                return
+
+            if(event.target instanceof HTMLInputElement)
+                return
+
+            if(this.recording)
+            {
+                const output = '[ ' + this.recording.map(p => `[ ${p[0]}, ${p[1]} ]`).join(', ') + ' ]'
+                console.log('%cRoute recorded, paste into sources/data/routes.js:', 'font-weight:bold', output)
+                navigator.clipboard?.writeText(output).catch(() => {})
+                this.game.notifications?.add?.({ text: `Route recorded, ${this.recording.length} points, copied` })
+                this.recording = null
+            }
+            else
+            {
+                this.recording = []
+                this.game.notifications?.add?.({ text: 'Recording route, press R to finish' })
+            }
+        })
+    }
+
+    sampleRecording()
+    {
+        if(!this.recording)
+            return
+
+        const position = this.game.player.position
+        const last = this.recording[this.recording.length - 1]
+
+        if(last && Math.hypot(position.x - last[0], position.z - last[1]) < Autopilot.SAMPLE_SPACING)
+            return
+
+        this.recording.push([ Math.round(position.x * 10) / 10, Math.round(position.z * 10) / 10 ])
+    }
+
     update()
     {
+        this.sampleRecording()
+
         if(!this.target)
             return
 
@@ -212,7 +281,17 @@ export class Autopilot
         this.toTarget2D.set(this.target.x - position.x, this.target.z - position.z)
         const distance = this.toTarget2D.length()
 
-        if(distance < Autopilot.ARRIVE_DISTANCE)
+        const isFinal = this.waypointIndex >= this.waypoints.length - 1
+        const threshold = isFinal ? Autopilot.ARRIVE_DISTANCE : Autopilot.WAYPOINT_DISTANCE
+
+        if(distance < threshold && !isFinal)
+        {
+            this.waypointIndex++
+            this.target = this.waypoints[this.waypointIndex]
+            return
+        }
+
+        if(distance < threshold)
         {
             this.game.player.accelerating = 0
             this.game.player.braking = 1

@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { color, vec4 } from 'three/tsl'
 import { Area } from './Area.js'
-import { createTextGeometry } from '../../utilities/text3D.js'
+import { createTextPlane } from '../../utilities/text3D.js'
 import { InteractivePoints } from '../../InteractivePoints.js'
 
 /**
@@ -112,23 +112,26 @@ export class ProceduralArea extends Area
     }
 
     /**
-     * Signage above the area. Async because the typeface loads on demand.
+     * Signage above the area, drawn flat rather than extruded so it reads at
+     * distance the way the rest of the world's labels do.
      */
-    async addSign(lines, { elevation = 4.2, spacing = 0.5, size = 0.42 } = {})
+    addSign(lines, { elevation = 4.2, spacing = 0.5, size = 0.42, width = 12 } = {})
     {
         let index = 0
 
         for(const line of lines)
         {
-            const geometry = await createTextGeometry(line.text ?? line, {
-                size: line.size ?? (index === 0 ? size : size * 0.6),
-                depth: 0.05,
-                curveSegments: 3
+            const fontSize = line.size ?? (index === 0 ? size : size * 0.62)
+
+            const mesh = createTextPlane(line.text ?? line, {
+                hex: this.accent,
+                worldWidth: width,
+                worldHeight: fontSize * 1.6,
+                fontSize: fontSize,
+                density: 140
             })
 
-            const mesh = new THREE.Mesh(geometry, this.materials.accent)
             mesh.position.y = elevation - index * spacing
-            mesh.castShadow = false
             this.group.add(mesh)
 
             index++

@@ -5,7 +5,7 @@ import { InteractivePoints } from '../../InteractivePoints.js'
 import { Area } from './Area.js'
 import gsap from 'gsap'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
-import { createLetters, createTextGeometry } from '../../utilities/text3D.js'
+import { createLetters, createTextPlane } from '../../utilities/text3D.js'
 
 export class LandingArea extends Area
 {
@@ -21,24 +21,14 @@ export class LandingArea extends Area
     // roughly double this and swamped the name; the second overshot the other
     // way and became unreadable. This sits between the two.
     static SIGNBOARD_LINES = [
-        { text: 'AI / COMPUTER VISION / 3D PERCEPTION', size: 0.34, elevation: 3.65 },
-        { text: 'M.SC. COMPUTER SCIENCE, STUTTGART', size: 0.26, elevation: 3.10 },
-        { text: 'EXPLORE THE RESEARCH CAMPUS', size: 0.22, elevation: 2.65 },
+        { text: 'AI  ·  COMPUTER VISION  ·  3D PERCEPTION', size: 0.62, width: 11, elevation: 3.95 },
+        { text: 'M.SC. COMPUTER SCIENCE  ·  STUTTGART', size: 0.44, width: 9, elevation: 3.15 },
+        { text: 'EXPLORE THE RESEARCH CAMPUS', size: 0.36, width: 8, elevation: 2.55 },
     ]
 
-    static SIGNPOST_POSITION = { x: 42.5, y: 0, z: 35.6 }
-    static SIGNPOST_HEIGHT = 3.2
-    static SIGNPOST_ARM_LENGTH = 1.9
+    static HINT_POSITION = { x: 42.5, z: 35.6 }
+    static HINT_ROTATION = 0.436
 
-    // Area centres taken from the world model, so the arms point at the real
-    // thing rather than depending on other areas having been built first.
-    static SIGNPOST_TARGETS = [
-        { label: 'CV LAB', x: 12.30, z: 35.30 },
-        { label: 'AI LAB', x: 70.00, z: 15.00 },
-        { label: 'PROJECTS', x: 35.76, z: 13.41 },
-        { label: 'CAREER', x: 25.84, z: -0.90 },
-        { label: 'CONTACT', x: 28.90, z: -21.80 },
-    ]
 
     constructor(model)
     {
@@ -48,7 +38,7 @@ export class LandingArea extends Area
 
         this.setLetters()
         this.setSignboard()
-        this.setSignpost()
+        this.setGroundHint()
         this.setKiosk()
         this.setControls()
         this.setBonfire()
@@ -158,7 +148,7 @@ export class LandingArea extends Area
      * they skip the physics pipeline, but they join the area's hideable list to
      * be culled with everything else when the area leaves the view.
      */
-    async setSignboard()
+    setSignboard()
     {
         const references = this.references.items.get('letters')
 
@@ -170,19 +160,19 @@ export class LandingArea extends Area
         const center = first.clone().add(last).multiplyScalar(0.5)
         const rotationY = references[0].rotation.y
 
-        const material = new THREE.MeshBasicNodeMaterial()
-        material.outputNode = vec4(color(LandingArea.ACCENT_COLOR).mul(1.9), 1)
-
         for(const line of LandingArea.SIGNBOARD_LINES)
         {
-            const geometry = await createTextGeometry(line.text, { size: line.size, depth: 0.06, curveSegments: 3 })
+            const mesh = createTextPlane(line.text, {
+                hex: LandingArea.ACCENT_COLOR,
+                worldWidth: line.width,
+                worldHeight: line.size * 1.6,
+                fontSize: line.size,
+                density: 140
+            })
 
-            const mesh = new THREE.Mesh(geometry, material)
             mesh.position.copy(center)
             mesh.position.y = line.elevation
             mesh.rotation.y = rotationY
-            mesh.castShadow = false
-            mesh.receiveShadow = false
 
             this.game.scene.add(mesh)
             this.objects.hideable.push(mesh)
@@ -190,62 +180,67 @@ export class LandingArea extends Area
     }
 
     /**
-     * A signpost by the spawn with one arm per area, each rotated to actually
-     * point at it. Without this the world gives a first-time visitor no reason
-     * to pick one direction over another.
+     * A hint painted on the paving by the spawn, plus the keyboard prop moved
+     * alongside it.
+     *
+     * This replaces the fingerpost that used to stand here. Its arms pointed at
+     * real coordinates but read as wrong from the ground, and a first-time
+     * visitor needs to know which keys move the car far more than they need a
+     * compass.
      */
-    async setSignpost()
+    setGroundHint()
     {
-        const origin = LandingArea.SIGNPOST_POSITION
+        const origin = LandingArea.HINT_POSITION
+
+        const mesh = createTextPlane('PRESS THE ARROW KEYS TO DRIVE', {
+            hex: LandingArea.ACCENT_COLOR,
+            worldWidth: 9,
+            worldHeight: 1.4,
+            fontSize: 0.85,
+            density: 140,
+            intensity: 1.5
+        })
+
+        // Laid into the paving, turned to face the way the car starts out.
+        mesh.rotation.x = - Math.PI / 2
+        mesh.rotation.z = LandingArea.HINT_ROTATION
+        mesh.position.set(origin.x, 0.03, origin.z)
+
+        this.game.scene.add(mesh)
+        this.objects.hideable.push(mesh)
+
+        this.cloneKeyboard(origin)
+    }
+
+    /**
+     * The keyboard prop lives over by the controls kiosk. A copy is placed by
+     * the hint so the instruction has something to point at, and the kiosk
+     * keeps its own display intact.
+     */
+    cloneKeyboard(origin)
+    {
+        const parts = this.objects.items
+            .map(object => object.visual?.object3D)
+            .filter(object3D => object3D && /^Plane00[24]$/.test(object3D.name))
+
+        if(parts.length === 0)
+            return
 
         const group = new THREE.Group()
-        group.position.set(origin.x, origin.y, origin.z)
+        group.position.set(origin.x, 0, origin.z - 2.2)
+        group.rotation.y = LandingArea.HINT_ROTATION
+        group.scale.setScalar(1.6)
+
+        for(const part of parts)
+        {
+            const clone = part.clone(true)
+            // Re-base onto the group: the originals sit in world space.
+            clone.position.sub(parts[0].position)
+            group.add(clone)
+        }
+
         this.game.scene.add(group)
         this.objects.hideable.push(group)
-
-        const woodMaterial = new THREE.MeshLambertNodeMaterial({ color: 0x6b5b4a })
-        const textMaterial = new THREE.MeshBasicNodeMaterial()
-        textMaterial.outputNode = vec4(color(LandingArea.ACCENT_COLOR).mul(1.9), 1)
-
-        // Post
-        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, LandingArea.SIGNPOST_HEIGHT, 8), woodMaterial)
-        post.position.y = LandingArea.SIGNPOST_HEIGHT / 2
-        post.castShadow = true
-        post.receiveShadow = true
-        group.add(post)
-
-        const armGeometry = new THREE.BoxGeometry(LandingArea.SIGNPOST_ARM_LENGTH, 0.4, 0.07)
-        const tipGeometry = new THREE.ConeGeometry(0.26, 0.36, 4)
-
-        let index = 0
-        for(const target of LandingArea.SIGNPOST_TARGETS)
-        {
-            const arm = new THREE.Group()
-            arm.position.y = LandingArea.SIGNPOST_HEIGHT - 0.45 - index * 0.55
-
-            // Rotation that maps the arm's local +X onto the direction of travel.
-            arm.rotation.y = Math.atan2(- (target.z - origin.z), target.x - origin.x)
-
-            const plank = new THREE.Mesh(armGeometry, woodMaterial)
-            plank.position.x = LandingArea.SIGNPOST_ARM_LENGTH / 2
-            plank.castShadow = true
-            plank.receiveShadow = true
-            arm.add(plank)
-
-            const tip = new THREE.Mesh(tipGeometry, woodMaterial)
-            tip.position.x = LandingArea.SIGNPOST_ARM_LENGTH + 0.14
-            tip.rotation.z = - Math.PI / 2
-            tip.castShadow = true
-            arm.add(tip)
-
-            const geometry = await createTextGeometry(target.label, { size: 0.22, depth: 0.03, curveSegments: 3 })
-            const label = new THREE.Mesh(geometry, textMaterial)
-            label.position.set(LandingArea.SIGNPOST_ARM_LENGTH / 2, 0, 0.06)
-            arm.add(label)
-
-            group.add(arm)
-            index++
-        }
     }
 
     setKiosk()
@@ -465,11 +460,34 @@ export class LandingArea extends Area
         )
     }
 
+    /**
+     * Stands the name back up once nobody is looking.
+     *
+     * The letters are knockable on purpose, but a permanently flattened name is
+     * a bad first impression for the next visitor. Leaving the area resets them,
+     * so the name is always upright on arrival and always still hittable.
+     */
+    restoreLetters()
+    {
+        for(const reference of this.references.items.get('letters'))
+        {
+            const object = reference.userData.object
+
+            if(object?.physical?.body.isEnabled())
+                this.game.objects.resetObject(object)
+        }
+    }
+
     setAchievement()
     {
         this.events.on('boundingIn', () =>
         {
             this.game.achievements.setProgress('areas', 'landing')
+        })
+
+        this.events.on('boundingOut', () =>
+        {
+            this.restoreLetters()
         })
         this.events.on('boundingOut', () =>
         {

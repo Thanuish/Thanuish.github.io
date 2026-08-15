@@ -1,4 +1,6 @@
 import * as THREE from 'three/webgpu'
+import { color, texture, vec4 } from 'three/tsl'
+import { TextCanvas } from '../TextCanvas.js'
 
 /**
  * Extruded 3D text helpers.
@@ -140,4 +142,52 @@ export function getGeometrySize(geometry)
         geometry.computeBoundingBox()
 
     return new THREE.Vector3().subVectors(geometry.boundingBox.max, geometry.boundingBox.min)
+}
+
+/**
+ * Flat signage text drawn on a canvas, the way the rest of the world does it.
+ *
+ * Extruded glyphs read poorly at distance: they catch the scene lighting, the
+ * side walls muddy the letterforms and thin strokes disappear. The original
+ * world renders every label as flat text on a plane in its own display face,
+ * so signage matches it instead of fighting it.
+ *
+ * @returns {THREE.Mesh} centred on its own origin, lying in the XY plane
+ */
+export function createTextPlane(text, {
+    hex = '#5fd2ff',
+    worldWidth = 8,
+    worldHeight = 1.2,
+    fontSize = 0.8,
+    density = 100,
+    fontFamily = 'Amatic SC',
+    fontWeight = '700',
+    intensity = 1.9
+} = {})
+{
+    const canvas = new TextCanvas(
+        fontFamily,
+        fontWeight,
+        fontSize,
+        worldWidth,
+        worldHeight,
+        density,
+        'center'
+    )
+    canvas.updateText(text)
+
+    const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
+
+    // The canvas is white on black, so its red channel doubles as the mask.
+    material.outputNode = vec4(
+        color(hex).mul(intensity),
+        texture(canvas.texture).r
+    )
+
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(worldWidth, worldHeight), material)
+    mesh.castShadow = false
+    mesh.receiveShadow = false
+    mesh.userData.textCanvas = canvas
+
+    return mesh
 }
