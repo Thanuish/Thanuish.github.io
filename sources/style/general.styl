@@ -56,6 +56,18 @@ html
     @media only screen and (max-width 440px)
         font-size 16px;
 
+    // The original scale only ever stepped down. On a large display every
+    // rem-sized element, the map, the menu, the detail panel, stayed at its
+    // small-screen size and read as tiny. These step it back up.
+    @media only screen and (min-width 1500px)
+        font-size 24px
+
+    @media only screen and (min-width 1900px)
+        font-size 28px
+
+    @media only screen and (min-width 2400px)
+        font-size 32px
+
 ul
 ol
     padding-left 25px
