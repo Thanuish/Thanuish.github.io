@@ -215,6 +215,8 @@ export class VisionLabArea extends ProceduralArea
 
     update()
     {
+        this.faceCamera(this.signMeshes)
+
         const delta = this.game.ticker.deltaScaled
 
         this.localTime += delta

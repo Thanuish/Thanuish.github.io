@@ -29,6 +29,32 @@ export class Area
         }, 10)
     }
 
+    /**
+     * Turns flat text planes to face the camera on the Y axis.
+     *
+     * A single plane always reads mirrored from behind, and there is no fixed
+     * angle that is correct from every approach. Facing the camera removes the
+     * question: signage is legible wherever the visitor is standing.
+     */
+    faceCamera(meshes)
+    {
+        if(!meshes || meshes.length === 0)
+            return
+
+        const camera = this.game.view?.camera?.instance ?? this.game.view?.camera
+
+        if(!camera)
+            return
+
+        for(const mesh of meshes)
+        {
+            mesh.rotation.y = Math.atan2(
+                camera.position.x - mesh.position.x,
+                camera.position.z - mesh.position.z
+            )
+        }
+    }
+
     setObjects()
     {
         this.objects = {}

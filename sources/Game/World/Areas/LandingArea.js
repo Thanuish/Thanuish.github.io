@@ -158,7 +158,7 @@ export class LandingArea extends Area
         const first = references[0].position.clone()
         const last = references[references.length - 1].position.clone()
         const center = first.clone().add(last).multiplyScalar(0.5)
-        const rotationY = references[0].rotation.y
+        this.signboardMeshes = []
 
         for(const line of LandingArea.SIGNBOARD_LINES)
         {
@@ -172,12 +172,9 @@ export class LandingArea extends Area
 
             mesh.position.copy(center)
             mesh.position.y = line.elevation
-            // A plane faces +Z; the baked row faces the other way, so it is
-            // turned about to present its front, or the text reads mirrored.
-            mesh.rotation.y = rotationY + Math.PI
-
             this.game.scene.add(mesh)
             this.objects.hideable.push(mesh)
+            this.signboardMeshes.push(mesh)
         }
     }
 
@@ -466,6 +463,8 @@ export class LandingArea extends Area
 
     update()
     {
+        this.faceCamera(this.signboardMeshes)
+
         this.localTime.value += this.game.ticker.deltaScaled * 0.1
     }
 }

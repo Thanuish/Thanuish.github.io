@@ -58,6 +58,8 @@ export class ProceduralArea extends Area
         this.game.scene.add(this.group)
         this.objects.hideable.push(this.group)
 
+        this.signMeshes = []
+
         this.materials = {
             accent: this.createEmissiveMaterial(this.accent),
             structure: new THREE.MeshLambertNodeMaterial({ color: 0x2a2733 }),
@@ -117,6 +119,7 @@ export class ProceduralArea extends Area
      */
     addSign(lines, { elevation = 4.2, spacing = 0.5, size = 0.42, width = 12 } = {})
     {
+        this.signMeshes = this.signMeshes ?? []
         let index = 0
 
         for(const line of lines)
@@ -133,6 +136,7 @@ export class ProceduralArea extends Area
 
             mesh.position.y = elevation - index * spacing
             this.group.add(mesh)
+            this.signMeshes.push(mesh)
 
             index++
         }

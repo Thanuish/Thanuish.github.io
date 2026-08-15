@@ -143,4 +143,9 @@ export class AiLabArea extends ProceduralArea
             })
         })
     }
+
+    update()
+    {
+        this.faceCamera(this.signMeshes)
+    }
 }

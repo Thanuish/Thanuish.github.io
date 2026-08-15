@@ -48,7 +48,6 @@ import { PreRenderer } from './PreRenderer.js'
 import { Options } from './Options.js'
 import gsap from 'gsap'
 import { Map } from './Map.js'
-import { Autopilot } from './Autopilot.js'
 
 export class Game
 {
@@ -196,7 +195,6 @@ export class Game
         this.tornado = new Tornado()
         this.map = new Map()
         this.title = new Title()
-        this.autopilot = new Autopilot()
         // this.monitoring = new Monitoring()
         this.world.step(1)
         this.overlay = new Overlay()
