@@ -129,17 +129,23 @@ export class LandingArea extends Area
             const position = center.clone().addScaledVector(axis, - letter.offset)
             position.y = elevation
 
+            const rotation = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotationY)
+
             object.physical.body.setTranslation(position, true)
-            object.physical.body.setRotation(
-                new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotationY),
-                true
-            )
+            object.physical.body.setRotation(rotation, true)
             object.physical.colliders[0].setHalfExtents({
                 x: letter.width / 2,
                 y: letter.height / 2,
                 z: letter.depth / 2
             })
             object.physical.body.wakeUp()
+
+            // Reset restores each body to the state captured when it was
+            // created, which is the original word's layout. Without rebasing
+            // it here, resetting the world puts the letters back in their old
+            // slots and the name reads backwards.
+            object.physical.initialState.position = { x: position.x, y: position.y, z: position.z }
+            object.physical.initialState.rotation = { x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w }
 
             reference.position.copy(position)
             reference.needsUpdate = true

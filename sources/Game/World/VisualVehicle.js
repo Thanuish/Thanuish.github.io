@@ -11,6 +11,9 @@ import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 
 export class VisualVehicle
 {
+    static BODY_ORIGINAL = 'original'
+    static BODY_GENERATED = 'sport'
+
     constructor(model)
     {
         this.game = Game.getInstance()
@@ -126,40 +129,65 @@ export class VisualVehicle
         // Wheel
         this.game.materials.updateObject(this.parts.wheelContainer)
 
-        this.setGeneratedBody()
+        this.setBodyStyles()
     }
 
     /**
-     * Swaps the shipped shell for the generated 911-style body.
+     * Two bodies: the shipped model, and a generated 911-style shell.
      *
-     * Only the painted shell's geometry is replaced, so the paint system, the
-     * achievement colours and everything bolted to the chassis keep working
-     * untouched. The original detail mesh is hidden rather than removed, so
-     * dropping this one call restores the original car exactly.
+     * Both are kept live so the choice is reversible at runtime. Only the
+     * painted shell's geometry is ever swapped, so the paint system and the
+     * achievement colours keep working across either style.
      */
-    setGeneratedBody()
+    setBodyStyles()
     {
+        this.bodyStyles = {}
+        this.bodyStyles.originalGeometry = this.parts.bodyPainted.geometry
+
+        // Meshes that belong to the shipped shape and must hide with it.
+        this.bodyStyles.originalDetails = [ 'common', 'headlights' ]
+            .map(name => this.parts.chassis.children.find(child => child.name.startsWith(name)))
+            .filter(Boolean)
+
         const { shellGeometry, details } = buildGeneratedVehicleBody()
-
-        this.parts.bodyPainted.geometry.dispose()
-        this.parts.bodyPainted.geometry = shellGeometry
-
-        // The shipped detail shell and headlights belong to the old shape.
-        for(const name of [ 'common', 'headlights' ])
-        {
-            const mesh = this.parts.chassis.getObjectByName(name)
-                ?? this.parts.chassis.children.find(child => child.name.startsWith(name))
-
-            if(mesh)
-                mesh.visible = false
-        }
+        this.bodyStyles.generatedGeometry = shellGeometry
 
         // Details ride in the painted shell's scaled space so they line up
         // with the profile without every offset needing to be pre-divided.
         details.scale.setScalar(this.parts.bodyPainted.scale.x)
+        details.visible = false
         this.parts.chassis.add(details)
+        this.bodyStyles.generatedDetails = details
 
-        this.parts.generatedDetails = details
+        this.setBodyStyle(localStorage.getItem('bodyStyle') ?? VisualVehicle.BODY_ORIGINAL)
+    }
+
+    setBodyStyle(style)
+    {
+        const generated = style === VisualVehicle.BODY_GENERATED
+
+        this.parts.bodyPainted.geometry = generated
+            ? this.bodyStyles.generatedGeometry
+            : this.bodyStyles.originalGeometry
+
+        for(const mesh of this.bodyStyles.originalDetails)
+            mesh.visible = !generated
+
+        this.bodyStyles.generatedDetails.visible = generated
+
+        this.bodyStyle = style
+        localStorage.setItem('bodyStyle', style)
+    }
+
+    toggleBodyStyle()
+    {
+        this.setBodyStyle(
+            this.bodyStyle === VisualVehicle.BODY_GENERATED
+                ? VisualVehicle.BODY_ORIGINAL
+                : VisualVehicle.BODY_GENERATED
+        )
+
+        return this.bodyStyle
     }
 
     setPaints()

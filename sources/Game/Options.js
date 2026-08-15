@@ -9,6 +9,7 @@ export class Options
 
         this.setSound()
         this.setQuality()
+        this.setBodyStyle()
         this.setRespawn()
         this.setReset()
         this.setRenderer()
@@ -36,6 +37,36 @@ export class Options
         this.game.quality.events.on('change', () =>
         {
             text.textContent = this.game.quality.level === 0 ? 'High' : 'Low'
+        })
+    }
+
+    setBodyStyle()
+    {
+        const element = this.element.querySelector('.js-body-style')
+
+        if(!element)
+            return
+
+        const text = element.querySelector('span')
+
+        // Options is constructed before the world exists, so the vehicle is
+        // looked up lazily. The initial label comes from the stored preference,
+        // which is the same value the vehicle will read when it is built.
+        const label = (style) =>
+        {
+            text.textContent = style === 'sport' ? 'Sport' : 'Classic'
+        }
+
+        label(localStorage.getItem('bodyStyle') ?? 'original')
+
+        element.addEventListener('click', () =>
+        {
+            const vehicle = this.game.world?.visualVehicle
+
+            if(!vehicle?.toggleBodyStyle)
+                return
+
+            label(vehicle.toggleBodyStyle())
         })
     }
 
