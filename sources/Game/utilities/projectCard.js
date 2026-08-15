@@ -82,20 +82,20 @@ export function createProjectCardTexture(card)
     // Kicker
     if(card.kicker)
     {
-        context.font = '800 20px Nunito, sans-serif'
+        context.font = '800 25px Nunito, sans-serif'
         context.fillStyle = accent
         context.textBaseline = 'top'
         context.fillText(card.kicker.toUpperCase(), PADDING, y)
-        y += 34
+        y += 40
     }
 
     // Title
-    context.font = '900 46px Nunito, sans-serif'
+    context.font = '900 58px Nunito, sans-serif'
     context.fillStyle = TEXT
     for(const line of wrap(context, card.title, contentWidth))
     {
         context.fillText(line, PADDING, y)
-        y += 54
+        y += 66
     }
 
     y += 18
@@ -103,7 +103,7 @@ export function createProjectCardTexture(card)
     // Body lines, each with a small accent bullet
     if(card.lines)
     {
-        context.font = '400 24px Nunito, sans-serif'
+        context.font = '400 29px Nunito, sans-serif'
 
         for(const line of card.lines)
         {
@@ -123,7 +123,7 @@ export function createProjectCardTexture(card)
 
                 context.fillStyle = TEXT_FADED
                 context.fillText(wrappedLine, PADDING + 28, y)
-                y += 32
+                y += 38
             }
 
             y += 8
@@ -133,7 +133,7 @@ export function createProjectCardTexture(card)
     // Tech chips along the bottom
     if(card.chips && card.chips.length)
     {
-        context.font = '700 20px Nunito, sans-serif'
+        context.font = '700 24px Nunito, sans-serif'
 
         let chipX = PADDING
         let chipY = HEIGHT - PADDING - 34

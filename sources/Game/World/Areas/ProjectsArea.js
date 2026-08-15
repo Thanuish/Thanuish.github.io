@@ -506,6 +506,11 @@ export class ProjectsArea extends Area
                 resource = { texture: createProjectCardTexture(this.cards.get(key)), loaded: true }
                 this.images.resources.set(key, resource)
 
+                // The board only builds its material the first time a load
+                // finishes, so a synchronously ready card still has to announce
+                // itself. Safe to re-enter: the resource is already cached.
+                this.images.loadEnded(key)
+
                 return resource
             }
 

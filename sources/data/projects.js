@@ -19,7 +19,7 @@ export default [
     {
         title: 'Multimodal Deepfake Detection',
         titleSmall: [ 'Deepfake', 'Detection' ],
-        attributes: { role: "Bachelor's thesis, sole developer" },
+        attributes: { role: "Bachelor's thesis" },
         distinctions: [],
         cards: [
             {
@@ -103,9 +103,9 @@ export default [
         ]
     },
     {
-        title: 'Sentiment Transfer in Movie Reviews',
+        title: 'Sentiment Transfer',
         titleSmall: [ 'Sentiment', 'Transfer' ],
-        attributes: { role: 'University of Stuttgart research' },
+        attributes: { role: 'Uni Stuttgart research' },
         distinctions: [],
         cards: [
             {
@@ -164,7 +164,7 @@ export default [
         ]
     },
     {
-        title: 'Helmet Detection & Plate Recognition',
+        title: 'Helmet & Plate Recognition',
         titleSmall: [ 'Helmet', 'Detection' ],
         attributes: { role: 'Computer vision project' },
         distinctions: [],
@@ -183,9 +183,9 @@ export default [
         ]
     },
     {
-        title: 'Academic Collocation Query Tool',
+        title: 'Collocation Query Tool',
         titleSmall: [ 'Collocation', 'Tool' ],
-        attributes: { role: 'University of Stuttgart project' },
+        attributes: { role: 'Uni Stuttgart project' },
         distinctions: [],
         cards: [
             {
@@ -199,6 +199,45 @@ export default [
                     'Structuring the cleaned data into a SQLite relational database, modelled for fast querying by word, part of speech and example.'
                 ],
                 chips: [ 'Python', 'BeautifulSoup', 'XSLT', 'XML', 'SQL', 'SQLite' ]
+            }
+        ]
+    },
+    {
+        title: 'LLM Token Optimisation',
+        titleSmall: [ 'Token', 'Optimisation' ],
+        attributes: { role: 'Personal project' },
+        distinctions: [],
+        cards: [
+            {
+                accent: ACCENT_AI,
+                kicker: 'Placeholder',
+                title: 'LLM token optimisation',
+                lines: [
+                    'This board is a placeholder. The project is real but its details are not in my master profile yet, so nothing has been written here.',
+                    'Tell me what it does, what it is built with and what it measurably achieved, and this fills in.'
+                ],
+                chips: [ 'To be written' ]
+            }
+        ]
+    },
+    {
+        title: 'This Portfolio',
+        titleSmall: [ 'This', 'Portfolio' ],
+        url: 'https://thanuish.github.io',
+        attributes: { role: 'Interactive 3D portfolio' },
+        distinctions: [],
+        cards: [
+            {
+                accent: ACCENT_SOFTWARE,
+                kicker: 'The thing you are driving through',
+                title: 'A portfolio built as a research campus',
+                lines: [
+                    'Built on folio-2025 by Bruno Simon, MIT licensed. The rendering, physics, vehicle and audio systems are his work, not mine.',
+                    'What is mine is the campus: the areas, the interactions and the content that describes my work.',
+                    'Every board and label you see is drawn to a canvas at runtime rather than shipped as an image, so all copy lives in one data file.',
+                    'The name at the landing is extruded 3D text generated in the browser, reusing the physics bodies the original world shipped with.'
+                ],
+                chips: [ 'Three.js', 'WebGPU', 'TSL', 'Rapier', 'Vite' ]
             }
         ]
     },

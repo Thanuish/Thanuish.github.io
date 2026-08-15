@@ -15,7 +15,10 @@ export class TextCanvas
     )
     {
         this.lines = []
-        this.font = `${fontWeight} ${fontSize * density}px "${fontFamily}"`
+        this.fontFamily = fontFamily
+        this.fontWeight = fontWeight
+        this.fontSize = fontSize * density
+        this.font = `${fontWeight} ${this.fontSize}px "${fontFamily}"`
         this.width = Math.ceil(width * density)
         this.height = Math.ceil(height * density)
         this.horizontalAlign = horizontalAlign
@@ -79,11 +82,37 @@ export class TextCanvas
         return output
     }
 
+    /**
+     * Shrinks the font until the longest line fits the canvas.
+     *
+     * Labels are authored against fixed-width canvases, so anything longer than
+     * the original text was silently clipped at both ends. Scaling down instead
+     * keeps a long project title or role readable.
+     */
+    fitFont()
+    {
+        this.context.font = this.font
+
+        let widest = 0
+        for(const line of this.lines)
+            widest = Math.max(widest, this.context.measureText(line).width)
+
+        const available = this.width * 0.96
+
+        if(widest <= available || widest === 0)
+            return
+
+        const fitted = Math.floor(this.fontSize * (available / widest))
+        this.context.font = `${this.fontWeight} ${fitted}px "${this.fontFamily}"`
+    }
+
     draw()
     {
         // Clear
         this.context.fillStyle = '#000000'
         this.context.fillRect(0, 0, this.width, this.height)
+
+        this.fitFont()
 
         this.context.textAlign = this.horizontalAlign
         this.context.textBaseline = 'middle'

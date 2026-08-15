@@ -489,6 +489,10 @@ export class LabArea extends Area
                 resource = { texture: createProjectCardTexture(this.cards.get(key)), loaded: true }
                 this.images.resources.set(key, resource)
 
+                // See ProjectsArea: the board's material is only built on the
+                // first completed load, so a ready-made card must announce it.
+                this.images.loadEnded(key)
+
                 return resource
             }
 
