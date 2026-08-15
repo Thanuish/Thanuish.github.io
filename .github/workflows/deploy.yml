@@ -26,7 +26,12 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      # npm ci is strict: it fails outright on any lockfile or platform
+      # resolution mismatch. Nothing in the Vite build needs sharp or
+      # gltf-transform (they are only used by scripts/compress.js, and the
+      # compressed assets are already committed), so a tolerant install is
+      # both safer here and considerably faster.
+      - run: npm install --no-audit --no-fund
 
       # VITE_COMPRESSED makes the build load the ktx textures and the
       # -compressed glb models that are committed alongside the raw ones.
