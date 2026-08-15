@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { color, texture, vec4 } from 'three/tsl'
+import { color, texture, uv, vec2, vec4 } from 'three/tsl'
 import { TextCanvas } from '../TextCanvas.js'
 
 /**
@@ -176,12 +176,14 @@ export function createTextPlane(text, {
     )
     canvas.updateText(text)
 
-    const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
+    const material = new THREE.MeshBasicNodeMaterial({ transparent: true, side: THREE.DoubleSide })
 
     // The canvas is white on black, so its red channel doubles as the mask.
+    // TextCanvas sets flipY false, so the V axis is inverted here to match a
+    // plane's default UVs, otherwise the text renders upside down.
     material.outputNode = vec4(
         color(hex).mul(intensity),
-        texture(canvas.texture).r
+        texture(canvas.texture, vec2(uv().x, uv().y.oneMinus())).r
     )
 
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(worldWidth, worldHeight), material)

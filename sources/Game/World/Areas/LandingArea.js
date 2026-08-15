@@ -172,7 +172,9 @@ export class LandingArea extends Area
 
             mesh.position.copy(center)
             mesh.position.y = line.elevation
-            mesh.rotation.y = rotationY
+            // A plane faces +Z; the baked row faces the other way, so it is
+            // turned about to present its front, or the text reads mirrored.
+            mesh.rotation.y = rotationY + Math.PI
 
             this.game.scene.add(mesh)
             this.objects.hideable.push(mesh)
@@ -203,44 +205,11 @@ export class LandingArea extends Area
 
         // Laid into the paving, turned to face the way the car starts out.
         mesh.rotation.x = - Math.PI / 2
-        mesh.rotation.z = LandingArea.HINT_ROTATION
+        mesh.rotation.z = - LandingArea.HINT_ROTATION
         mesh.position.set(origin.x, 0.03, origin.z)
 
         this.game.scene.add(mesh)
         this.objects.hideable.push(mesh)
-
-        this.cloneKeyboard(origin)
-    }
-
-    /**
-     * The keyboard prop lives over by the controls kiosk. A copy is placed by
-     * the hint so the instruction has something to point at, and the kiosk
-     * keeps its own display intact.
-     */
-    cloneKeyboard(origin)
-    {
-        const parts = this.objects.items
-            .map(object => object.visual?.object3D)
-            .filter(object3D => object3D && /^Plane00[24]$/.test(object3D.name))
-
-        if(parts.length === 0)
-            return
-
-        const group = new THREE.Group()
-        group.position.set(origin.x, 0, origin.z - 2.2)
-        group.rotation.y = LandingArea.HINT_ROTATION
-        group.scale.setScalar(1.6)
-
-        for(const part of parts)
-        {
-            const clone = part.clone(true)
-            // Re-base onto the group: the originals sit in world space.
-            clone.position.sub(parts[0].position)
-            group.add(clone)
-        }
-
-        this.game.scene.add(group)
-        this.objects.hideable.push(group)
     }
 
     setKiosk()
