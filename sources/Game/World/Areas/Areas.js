@@ -13,6 +13,8 @@ import { BehindTheSceneArea } from './BehindTheSceneArea.js'
 import { AchievementsArea } from './AchievementsArea.js'
 import { TimeMachineArea } from './TimeMachineArea.js'
 import { EasterArea } from './EasterArea.js'
+import { VisionLabArea } from './VisionLabArea.js'
+import { AiLabArea } from './AiLabArea.js'
 
 export class Areas
 {
@@ -44,6 +46,17 @@ export class Areas
                     this[name] = new AreaClass(child)
             }
         }
+
+        // Areas with no geometry in the world model. They build their own, so
+        // they are constructed from a generated zone-only model instead of a
+        // Blender node.
+        const proceduralList = [
+            [ 'visionLab', VisionLabArea ],
+            [ 'aiLab', AiLabArea ],
+        ]
+
+        for(const [ name, AreaClass ] of proceduralList)
+            this[name] = new AreaClass(AreaClass.createModel())
 
         // // Test how many areas are visible
         // this.game.ticker.events.on('tick', () =>

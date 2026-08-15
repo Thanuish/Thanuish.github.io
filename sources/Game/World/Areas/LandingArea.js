@@ -32,8 +32,9 @@ export class LandingArea extends Area
     // Area centres taken from the world model, so the arms point at the real
     // thing rather than depending on other areas having been built first.
     static SIGNPOST_TARGETS = [
+        { label: 'CV LAB', x: 12.30, z: 35.30 },
+        { label: 'AI LAB', x: 70.00, z: 15.00 },
         { label: 'PROJECTS', x: 35.76, z: 13.41 },
-        { label: 'LAB', x: 13.14, z: 17.68 },
         { label: 'CAREER', x: 25.84, z: -0.90 },
         { label: 'CONTACT', x: 28.90, z: -21.80 },
     ]

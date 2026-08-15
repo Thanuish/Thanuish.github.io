@@ -9,6 +9,7 @@ import { Inputs } from '../../Inputs/Inputs.js'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
 import { Area } from './Area.js'
 import { createProjectCardTexture } from '../../utilities/projectCard.js'
+import { openInfoPage } from '../../utilities/infoPage.js'
 
 export class ProjectsArea extends Area
 {
@@ -90,11 +91,10 @@ export class ProjectsArea extends Area
     }
 
     /**
-     * Fills the project modal from the current project and opens it.
+     * Hands the current project to the shared detail page.
      *
      * The board can only ever show one card at a time and has no room for the
-     * full write-up, so opening a project hands the detail to a scrollable
-     * page built from the same card data.
+     * full write-up, so each card becomes a section of a scrollable page.
      */
     openProjectPage()
     {
@@ -103,92 +103,14 @@ export class ProjectsArea extends Area
         if(!project)
             return
 
-        const modal = document.querySelector('.js-modal[data-name="project"]')
-
-        modal.querySelector('.js-project-role').textContent = project.attributes?.role ?? ''
-        modal.querySelector('.js-project-title').textContent = project.title
-
-        const body = modal.querySelector('.js-project-body')
-        body.replaceChildren()
-
-        for(const card of project.cards ?? [])
-        {
-            const section = document.createElement('div')
-            section.className = 'section'
-
-            if(card.kicker)
-            {
-                const kicker = document.createElement('div')
-                kicker.className = 'kicker'
-                kicker.style.color = card.accent ?? ''
-                kicker.textContent = card.kicker
-                section.append(kicker)
-            }
-
-            const heading = document.createElement('h2')
-            heading.className = 'heading'
-            heading.textContent = card.title
-            section.append(heading)
-
-            if(card.lines?.length)
-            {
-                const list = document.createElement('ul')
-
-                for(const line of card.lines)
-                {
-                    const item = document.createElement('li')
-                    item.textContent = line
-                    list.append(item)
-                }
-
-                section.append(list)
-            }
-
-            if(card.chips?.length)
-            {
-                const chips = document.createElement('div')
-                chips.className = 'chips'
-                chips.style.color = card.accent ?? ''
-
-                for(const chip of card.chips)
-                {
-                    const element = document.createElement('span')
-                    element.className = 'chip'
-                    element.textContent = chip
-                    chips.append(element)
-                }
-
-                section.append(chips)
-            }
-
-            body.append(section)
-        }
-
-        const links = modal.querySelector('.js-project-links')
-        links.replaceChildren()
-
-        if(project.url)
-        {
-            const anchor = document.createElement('a')
-            anchor.className = 'button'
-            anchor.href = project.url
-            anchor.target = '_blank'
-            anchor.rel = 'noreferrer'
-            anchor.textContent = 'Open repository'
-            links.append(anchor)
-        }
-        else
-        {
-            const note = document.createElement('span')
-            note.className = 'no-link'
-            note.textContent = 'Not public yet'
-            links.append(note)
-        }
-
-        // Always start a newly opened project at the top.
-        modal.querySelector('.js-scroller').scrollTop = 0
-
-        this.game.modals.open('project')
+        openInfoPage(this.game, {
+            role: project.attributes?.role,
+            title: project.title,
+            sections: project.cards,
+            url: project.url,
+            urlLabel: 'Open repository',
+            emptyLabel: 'Not public yet'
+        })
     }
 
     setSounds()
