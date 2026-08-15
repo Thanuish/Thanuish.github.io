@@ -4,9 +4,14 @@ import { color, float, Fn, luminance, max, mix, positionGeometry, step, texture,
 import gsap from 'gsap'
 import { clamp } from 'three/src/math/MathUtils.js'
 import { Area } from './Area.js'
+import careerData from '../../../data/career.js'
+import { createCareerLabelTexture } from '../../utilities/careerLabel.js'
 
 export class CareerArea extends Area
 {
+    static YEAR_START = 2020
+    static YEAR_END = 2026
+
     constructor(references)
     {
         super(references)
@@ -78,12 +83,35 @@ export class CareerArea extends Area
 
         for(const group of lineGroups)
         {
+            // The Blender texture name is the only stable id for a lane, so the
+            // timeline data is keyed by it. Falling back to the baked values
+            // keeps the area working if an entry is ever removed from the data.
+            const entry = careerData[group.userData.texture]
+
+            if(entry)
+            {
+                group.userData.size = entry.size
+                group.userData.hasEnd = entry.hasEnd
+                group.userData.color = entry.color
+                group.position.z = entry.z
+            }
+
             const line = {}
             line.group = group
             line.size = parseFloat(line.group.userData.size)
             line.hasEnd = line.group.userData.hasEnd
             line.color = line.group.userData.color
-            line.texture = this.game.resources[`${line.group.userData.texture}Texture`]
+
+            if(entry)
+            {
+                const label = createCareerLabelTexture(entry.organisation, entry.role)
+                line.texture = label.texture
+                line.labelAspect = label.aspect
+            }
+            else
+            {
+                line.texture = this.game.resources[`${line.group.userData.texture}Texture`]
+            }
 
             line.stone = line.group.children.find(child => child.name.startsWith('stone'))
             line.stone.position.y = 0
@@ -125,6 +153,12 @@ export class CareerArea extends Area
                 line.textMesh.castShadow = false
                 line.textMesh.receiveShadow = false
                 line.textMesh.material = material
+
+                // The label plane is authored to match its original texture's
+                // aspect. Generated labels vary in width, so the plane is
+                // re-stretched along X to keep the text from distorting.
+                if(line.labelAspect)
+                    line.textMesh.scale.x = line.textMesh.scale.z * line.labelAspect
             }
 
             this.lines.items.push(line)
@@ -155,7 +189,11 @@ export class CareerArea extends Area
         this.year.originZ = this.year.group.position.z
         this.year.size = 17
         this.year.offsetTarget = 0
-        this.year.start = 2008
+        this.year.start = CareerArea.YEAR_START
+        // The track is a fixed 17 world units. The original owner's career
+        // spanned it one year per unit; this timeline is shorter, so the
+        // counter advances at a fraction of a year per unit instead.
+        this.year.perUnit = (CareerArea.YEAR_END - CareerArea.YEAR_START) / this.year.size
         this.year.current = this.year.start
 
         //    Digit indexes
@@ -365,7 +403,7 @@ export class CareerArea extends Area
         const finalPositionZ = this.year.originZ - this.year.offsetTarget
         this.year.group.position.z += (finalPositionZ - this.year.group.position.z) * this.game.ticker.deltaScaled * 10
 
-        const yearCurrent = this.year.start + Math.floor(this.year.offsetTarget)
+        const yearCurrent = this.year.start + Math.floor(this.year.offsetTarget * this.year.perUnit)
 
         if(yearCurrent !== this.year.current)
         {
