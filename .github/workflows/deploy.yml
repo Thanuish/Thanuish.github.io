@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ thanuish-portfolio ]
+    branches: [ thanuish-portfolio, main ]
   workflow_dispatch:
 
 permissions:
