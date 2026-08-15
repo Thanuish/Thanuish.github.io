@@ -8,6 +8,7 @@ import { add, color, float, Fn, If, luminance, mix, mul, normalWorld, positionGe
 import { Inputs } from '../../Inputs/Inputs.js'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
 import { Area } from './Area.js'
+import { createProjectCardTexture } from '../../utilities/projectCard.js'
 
 export class ProjectsArea extends Area
 {
@@ -33,6 +34,7 @@ export class ProjectsArea extends Area
         
         this.state = ProjectsArea.STATE_CLOSED
 
+        this.setCards()
         this.setSounds()
         this.setInteractivePoint()
         this.setInputs()
@@ -61,6 +63,29 @@ export class ProjectsArea extends Area
         {
             this.debugPanel.addButton({ title: 'open', label: 'open' }).on('click', () => { this.open() })
             this.debugPanel.addButton({ title: 'close', label: 'close' }).on('click', () => { this.close() })
+        }
+    }
+
+    /**
+     * Gives every card a stable key and writes those keys back into each
+     * project's `images` array, so the rest of the carousel keeps working
+     * against filenames it never has to know are synthetic.
+     */
+    setCards()
+    {
+        this.cards = new Map()
+
+        let projectIndex = 0
+        for(const project of projectsData)
+        {
+            project.images = (project.cards ?? []).map((card, cardIndex) =>
+            {
+                const key = `card-${projectIndex}-${cardIndex}`
+                this.cards.set(key, card)
+                return key
+            })
+
+            projectIndex++
         }
     }
 
@@ -469,9 +494,20 @@ export class ProjectsArea extends Area
         this.images.getResourceAndLoad = (key) =>
         {
             const path = `projects/images/${key}`
-            
+
             // Try to retrieve resource
             let resource = this.images.resources.get(key)
+
+            // Boards are generated text cards rather than screenshots. Building
+            // them here keeps the carousel's resource contract intact: it still
+            // sees an object with `texture` and `loaded`.
+            if(!resource && this.cards.has(key))
+            {
+                resource = { texture: createProjectCardTexture(this.cards.get(key)), loaded: true }
+                this.images.resources.set(key, resource)
+
+                return resource
+            }
 
             // Resource not found => Create
             if(!resource)
@@ -1017,9 +1053,15 @@ export class ProjectsArea extends Area
             {
                 this.url.status = 'visible'
 
+                // Not every project has a public repository yet, so the panel
+                // shows a neutral label instead of a link when there is no URL.
+                const url = this.navigation.current.url
+
+                this.url.group.visible = true
+
                 gsap.to(this.url.inner.rotation, { x: Math.PI * 2 * rotationDirection, duration: 1, delay: 0, ease: 'back.out(2)', overwrite: true })
 
-                this.url.textCanvas.updateText(this.navigation.current.url.replace(/https?:\/\//, ''))
+                this.url.textCanvas.updateText(url ? url.replace(/https?:\/\//, '') : 'Not public yet')
 
                 const ratio = this.url.textCanvas.getMeasure().width / this.texts.density
                 this.url.panel.scale.x = ratio + 0.2

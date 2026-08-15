@@ -51,9 +51,14 @@ export class SocialArea extends Area
                 InteractivePoints.STATE_CONCEALED,
                 () =>
                 {
+                    // Placeholder slots are inert: they mark space for links
+                    // that don't exist yet rather than leading anywhere.
+                    if(link.soon)
+                        return
+
                     if(link.url)
                         window.open(link.url, '_blank')
-                    else(link.modal)
+                    else if(link.modal)
                         this.game.modals.open(link.modal)
                 },
                 () =>
