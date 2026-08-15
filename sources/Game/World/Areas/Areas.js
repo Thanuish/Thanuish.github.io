@@ -20,20 +20,18 @@ export class Areas
     {
         this.game = Game.getInstance()
 
+        // The world model still contains the original owner's playground areas
+        // (circuit, bowling, cookie, toilet, altar, time machine). They are left
+        // out so the campus is the five areas that carry my content, and the
+        // visitor is not sent wandering across an island of unrelated content.
+        // Re-adding one is a matter of putting its pair back in this list.
         const list = [
-            [ 'achievements', AchievementsArea ],
-            [ 'altar', AltarArea ],
             [ 'behindTheScene', BehindTheSceneArea ],
-            [ 'bowling', BowlingArea ],
             [ 'career', CareerArea ],
-            [ 'circuit', CircuitArea ],
-            [ 'cookie', CookieArea ],
             [ 'lab', LabArea ],
             [ 'landing', LandingArea ],
             [ 'projects', ProjectsArea ],
             [ 'social', SocialArea ],
-            [ 'toilet', ToiletArea ],
-            [ 'timeMachine', TimeMachineArea ],
         ]
 
         const model = [...this.game.resources.areasModel.scene.children]

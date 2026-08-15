@@ -9,6 +9,7 @@ import { remapClamp, safeMod, signedModDelta } from '../../utilities/maths.js'
 import { Inputs } from '../../Inputs/Inputs.js'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
 import { Area } from './Area.js'
+import { createProjectCardTexture } from '../../utilities/projectCard.js'
 
 export class LabArea extends Area
 {
@@ -34,6 +35,7 @@ export class LabArea extends Area
         
         this.state = LabArea.STATE_CLOSED
 
+        this.setCards()
         this.setSounds()
         this.setInteractivePoint()
         this.setInputs()
@@ -63,6 +65,27 @@ export class LabArea extends Area
         {
             this.debugPanel.addButton({ title: 'open', label: 'open' }).on('click', () => { this.open() })
             this.debugPanel.addButton({ title: 'close', label: 'close' }).on('click', () => { this.close() })
+        }
+    }
+
+    /**
+     * Registers inline placeholder boards under the key each entry advertises
+     * as its `image`, mirroring how the projects area handles its cards.
+     */
+    setCards()
+    {
+        this.cards = new Map()
+
+        let index = 0
+        for(const entry of labData)
+        {
+            if(entry.card)
+            {
+                entry.image = `lab-card-${index}`
+                this.cards.set(entry.image, entry.card)
+            }
+
+            index++
         }
     }
 
@@ -455,9 +478,19 @@ export class LabArea extends Area
         this.images.getResourceAndLoad = (key) =>
         {
             const path = `lab/images/${key}`
-            
+
             // Try to retrieve resource
             let resource = this.images.resources.get(key)
+
+            // Placeholder entries carry their board inline instead of pointing
+            // at a file, so build the texture rather than hitting the loader.
+            if(!resource && this.cards.has(key))
+            {
+                resource = { texture: createProjectCardTexture(this.cards.get(key)), loaded: true }
+                this.images.resources.set(key, resource)
+
+                return resource
+            }
 
             // Resource not found => Create
             if(!resource)
@@ -836,6 +869,11 @@ export class LabArea extends Area
                     mini.startLoading = () =>
                     {
                         if(mini.startedLoading)
+                            return
+
+                        // Entries without a thumbnail leave the shelf empty
+                        // rather than requesting a file that does not exist.
+                        if(!project.imageMini)
                             return
 
                         const loader = this.game.resourcesLoader.getLoader('textureKtx')
