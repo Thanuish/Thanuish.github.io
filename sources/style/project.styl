@@ -1,0 +1,96 @@
+.project
+    .content
+        max-width 46rem
+        width calc(100vw - 4rem)
+        max-height calc(100vh - 6rem)
+        display flex
+        flex-direction column
+
+    .scroller
+        overflow-y auto
+        overscroll-behavior contain
+        padding 0.5rem 0.25rem 0.5rem 0
+        -webkit-overflow-scrolling touch
+
+        &::-webkit-scrollbar
+            width 0.4rem
+
+        &::-webkit-scrollbar-thumb
+            background rgba(255, 255, 255, 0.25)
+            border-radius 0.2rem
+
+    .role
+        font-size 0.85rem
+        letter-spacing 0.08em
+        text-transform uppercase
+        opacity 0.6
+        margin-bottom 0.35rem
+
+    > .container > .content > .scroller > .title
+        font-size 2.4rem
+        line-height 1.1
+        margin 0 0 1.5rem
+
+    .body
+        .section
+            margin-bottom 2rem
+
+            &:last-child
+                margin-bottom 1rem
+
+        .kicker
+            font-size 0.8rem
+            letter-spacing 0.09em
+            text-transform uppercase
+            margin-bottom 0.4rem
+
+        .heading
+            font-size 1.25rem
+            line-height 1.3
+            margin 0 0 0.75rem
+
+        ul
+            margin 0
+            padding 0
+            list-style none
+
+        li
+            position relative
+            padding-left 1.1rem
+            margin-bottom 0.6rem
+            line-height 1.5
+            opacity 0.85
+
+            &:before
+                content ''
+                position absolute
+                left 0
+                top 0.6em
+                width 0.35rem
+                height 0.35rem
+                border-radius 50%
+                background currentColor
+
+        .chips
+            display flex
+            flex-wrap wrap
+            gap 0.4rem
+            margin-top 0.9rem
+
+        .chip
+            font-size 0.8rem
+            padding 0.25rem 0.7rem
+            border-radius 1rem
+            border 1px solid currentColor
+            opacity 0.8
+
+    .links
+        display flex
+        flex-wrap wrap
+        gap 0.75rem
+        margin-top 1rem
+
+        .no-link
+            font-size 0.9rem
+            opacity 0.5
+            align-self center

@@ -100,7 +100,16 @@ export function createProjectCardTexture(card)
 
     y += 18
 
-    // Body lines, each with a small accent bullet
+    // Body lines, each with a small accent bullet.
+    //
+    // The board is a summary: the full write-up lives in the project page. So
+    // rather than letting text run under the chips or off the bottom, drawing
+    // stops at the first line that will not fit and a hint is drawn instead.
+    const chipRowHeight = card.chips && card.chips.length ? 52 : 0
+    const bodyLimit = HEIGHT - PADDING - chipRowHeight - 38
+
+    let truncated = false
+
     if(card.lines)
     {
         context.font = '400 29px Nunito, sans-serif'
@@ -108,6 +117,14 @@ export function createProjectCardTexture(card)
         for(const line of card.lines)
         {
             const wrapped = wrap(context, line, contentWidth - 28)
+
+            // Keep bullets whole: a half-drawn point reads worse than none.
+            if(y + wrapped.length * 38 > bodyLimit)
+            {
+                truncated = true
+                break
+            }
+
             let first = true
 
             for(const wrappedLine of wrapped)
@@ -128,6 +145,13 @@ export function createProjectCardTexture(card)
 
             y += 8
         }
+    }
+
+    if(truncated)
+    {
+        context.font = '700 24px Nunito, sans-serif'
+        context.fillStyle = accent
+        context.fillText('Press ENTER to read more', PADDING + 28, y)
     }
 
     // Tech chips along the bottom

@@ -89,6 +89,108 @@ export class ProjectsArea extends Area
         }
     }
 
+    /**
+     * Fills the project modal from the current project and opens it.
+     *
+     * The board can only ever show one card at a time and has no room for the
+     * full write-up, so opening a project hands the detail to a scrollable
+     * page built from the same card data.
+     */
+    openProjectPage()
+    {
+        const project = this.navigation.current
+
+        if(!project)
+            return
+
+        const modal = document.querySelector('.js-modal[data-name="project"]')
+
+        modal.querySelector('.js-project-role').textContent = project.attributes?.role ?? ''
+        modal.querySelector('.js-project-title').textContent = project.title
+
+        const body = modal.querySelector('.js-project-body')
+        body.replaceChildren()
+
+        for(const card of project.cards ?? [])
+        {
+            const section = document.createElement('div')
+            section.className = 'section'
+
+            if(card.kicker)
+            {
+                const kicker = document.createElement('div')
+                kicker.className = 'kicker'
+                kicker.style.color = card.accent ?? ''
+                kicker.textContent = card.kicker
+                section.append(kicker)
+            }
+
+            const heading = document.createElement('h2')
+            heading.className = 'heading'
+            heading.textContent = card.title
+            section.append(heading)
+
+            if(card.lines?.length)
+            {
+                const list = document.createElement('ul')
+
+                for(const line of card.lines)
+                {
+                    const item = document.createElement('li')
+                    item.textContent = line
+                    list.append(item)
+                }
+
+                section.append(list)
+            }
+
+            if(card.chips?.length)
+            {
+                const chips = document.createElement('div')
+                chips.className = 'chips'
+                chips.style.color = card.accent ?? ''
+
+                for(const chip of card.chips)
+                {
+                    const element = document.createElement('span')
+                    element.className = 'chip'
+                    element.textContent = chip
+                    chips.append(element)
+                }
+
+                section.append(chips)
+            }
+
+            body.append(section)
+        }
+
+        const links = modal.querySelector('.js-project-links')
+        links.replaceChildren()
+
+        if(project.url)
+        {
+            const anchor = document.createElement('a')
+            anchor.className = 'button'
+            anchor.href = project.url
+            anchor.target = '_blank'
+            anchor.rel = 'noreferrer'
+            anchor.textContent = 'Open repository'
+            links.append(anchor)
+        }
+        else
+        {
+            const note = document.createElement('span')
+            note.className = 'no-link'
+            note.textContent = 'Not public yet'
+            links.append(note)
+        }
+
+        // Always start a newly opened project at the top.
+        modal.querySelector('.js-scroller').scrollTop = 0
+
+        this.game.modals.open('project')
+    }
+
     setSounds()
     {
         this.sounds = {}
@@ -169,7 +271,7 @@ export class ProjectsArea extends Area
         {
             if(!action.active && this.state === ProjectsArea.STATE_OPEN)
             {
-                this.url.open()
+                this.openProjectPage()
             }
         })
 
@@ -188,7 +290,7 @@ export class ProjectsArea extends Area
         this.game.inputs.interactiveButtons.events.on('open', () =>
         {
             if(this.state === ProjectsArea.STATE_OPEN)
-                this.url.open()
+                this.openProjectPage()
         })
 
         this.game.inputs.interactiveButtons.events.on('close', () =>

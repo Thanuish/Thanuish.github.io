@@ -17,10 +17,12 @@ export class LandingArea extends Area
 
     // Kept to plain ASCII on purpose: the extruded typeface has no glyph for
     // typographic separators like the middle dot.
+    // Sized against the 1.45-unit name letters below them. Earlier values were
+    // roughly double this and read as a wall of text that swamped the name.
     static SIGNBOARD_LINES = [
-        { text: 'AI / COMPUTER VISION / 3D PERCEPTION', size: 0.40, elevation: 4.05 },
-        { text: 'M.SC. COMPUTER SCIENCE, STUTTGART', size: 0.30, elevation: 3.35 },
-        { text: 'EXPLORE THE RESEARCH CAMPUS', size: 0.26, elevation: 2.80 },
+        { text: 'AI / COMPUTER VISION / 3D PERCEPTION', size: 0.22, elevation: 3.30 },
+        { text: 'M.SC. COMPUTER SCIENCE, STUTTGART', size: 0.17, elevation: 2.90 },
+        { text: 'EXPLORE THE RESEARCH CAMPUS', size: 0.15, elevation: 2.55 },
     ]
 
     static SIGNPOST_POSITION = { x: 42.5, y: 0, z: 35.6 }
