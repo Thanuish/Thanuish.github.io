@@ -2,10 +2,10 @@ import * as THREE from 'three/webgpu'
 import { Cycles } from './Cycles.js'
 
 const presets = {
-    day:   { revealColor: new THREE.Color('#5f7dff'), revealIntensity: 12, electricField: 0, temperature: 5, lightColor: new THREE.Color('#ffd2c2'), lightIntensity: 1.2, shadowColor: new THREE.Color('#6d3fff'), fogColorA: new THREE.Color('#00ffff'), fogColorB: new THREE.Color('#9b89ff'), fogNearRatio: 0.315, fogFarRatio: 1.25 },
-    dusk:  { revealColor: new THREE.Color('#ff86d9'), revealIntensity: 5.55, electricField: 0.25, temperature: 0, lightColor: new THREE.Color('#ff8181'), lightIntensity: 1.2, shadowColor: new THREE.Color('#4e009c'), fogColorA: new THREE.Color('#3e53ff'), fogColorB: new THREE.Color('#ff4ce4'), fogNearRatio: 0, fogFarRatio: 1.25 },
-    night: { revealColor: new THREE.Color('#b678ff'), revealIntensity: 10, electricField: 1, temperature: -7.5, lightColor: new THREE.Color('#3240ff'), lightIntensity: 3.8, shadowColor: new THREE.Color('#2f00db'), fogColorA: new THREE.Color('#10266f'), fogColorB: new THREE.Color('#490a42'), fogNearRatio: -0.85, fogFarRatio: 1 },
-    dawn:  { revealColor: new THREE.Color('#ff9d9d'), revealIntensity: 4.85, electricField: 0.25, temperature: 0, lightColor: new THREE.Color('#ffa882'), lightIntensity: 1.2, shadowColor: new THREE.Color('#db004f'), fogColorA: new THREE.Color('#f885ff'), fogColorB: new THREE.Color('#ff7d24'), fogNearRatio: 0.3, fogFarRatio: 1.25 },
+    day:   { revealColor: new THREE.Color('#9d7bff'), revealIntensity: 12, electricField: 0, temperature: 5, lightColor: new THREE.Color('#e9dcff'), lightIntensity: 1.2, shadowColor: new THREE.Color('#4a1fa8'), fogColorA: new THREE.Color('#7a5cff'), fogColorB: new THREE.Color('#c0a3ff'), fogNearRatio: 0.315, fogFarRatio: 1.25 },
+    dusk:  { revealColor: new THREE.Color('#d67bff'), revealIntensity: 5.55, electricField: 0.25, temperature: 0, lightColor: new THREE.Color('#b980ff'), lightIntensity: 1.2, shadowColor: new THREE.Color('#3c0080'), fogColorA: new THREE.Color('#5b3bff'), fogColorB: new THREE.Color('#c95cff'), fogNearRatio: 0, fogFarRatio: 1.25 },
+    night: { revealColor: new THREE.Color('#a678ff'), revealIntensity: 10, electricField: 1, temperature: -7.5, lightColor: new THREE.Color('#4a30d0'), lightIntensity: 3.8, shadowColor: new THREE.Color('#24006b'), fogColorA: new THREE.Color('#150a3a'), fogColorB: new THREE.Color('#360d55'), fogNearRatio: -0.85, fogFarRatio: 1 },
+    dawn:  { revealColor: new THREE.Color('#c79dff'), revealIntensity: 4.85, electricField: 0.25, temperature: 0, lightColor: new THREE.Color('#c9a3ff'), lightIntensity: 1.2, shadowColor: new THREE.Color('#5a0b8a'), fogColorA: new THREE.Color('#b385ff'), fogColorB: new THREE.Color('#8a5cff'), fogNearRatio: 0.3, fogFarRatio: 1.25 },
 }
 
 export class DayCycles extends Cycles

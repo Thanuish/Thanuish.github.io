@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu'
+import { buildGeneratedVehicleBody } from './vehicleBody.js'
 import { Game } from '../Game.js'
 import { Track } from '../Tracks.js'
 import { Trails } from '../Trails.js'
@@ -124,6 +125,41 @@ export class VisualVehicle
 
         // Wheel
         this.game.materials.updateObject(this.parts.wheelContainer)
+
+        this.setGeneratedBody()
+    }
+
+    /**
+     * Swaps the shipped shell for the generated 911-style body.
+     *
+     * Only the painted shell's geometry is replaced, so the paint system, the
+     * achievement colours and everything bolted to the chassis keep working
+     * untouched. The original detail mesh is hidden rather than removed, so
+     * dropping this one call restores the original car exactly.
+     */
+    setGeneratedBody()
+    {
+        const { shellGeometry, details } = buildGeneratedVehicleBody()
+
+        this.parts.bodyPainted.geometry.dispose()
+        this.parts.bodyPainted.geometry = shellGeometry
+
+        // The shipped detail shell and headlights belong to the old shape.
+        for(const name of [ 'common', 'headlights' ])
+        {
+            const mesh = this.parts.chassis.getObjectByName(name)
+                ?? this.parts.chassis.children.find(child => child.name.startsWith(name))
+
+            if(mesh)
+                mesh.visible = false
+        }
+
+        // Details ride in the painted shell's scaled space so they line up
+        // with the profile without every offset needing to be pre-divided.
+        details.scale.setScalar(this.parts.bodyPainted.scale.x)
+        this.parts.chassis.add(details)
+
+        this.parts.generatedDetails = details
     }
 
     setPaints()

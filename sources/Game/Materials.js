@@ -5,6 +5,12 @@ import { MeshDefaultMaterial } from './Materials/MeshDefaultMaterial.js'
 
 export class Materials
 {
+    // Theme. PALETTE_CHROMA_KEPT is how much of the original palette hue
+    // survives the grade: 0 is a pure duotone, 1 disables the theme entirely.
+    static PALETTE_SHADOW = '#241546'
+    static PALETTE_HIGHLIGHT = '#e4d8ff'
+    static PALETTE_CHROMA_KEPT = 0.26
+
     constructor()
     {
         this.game = Game.getInstance()
@@ -35,12 +41,29 @@ export class Materials
 
     createPalette()
     {
-        const material = new MeshDefaultMaterial({
-            colorNode: texture(this.game.resources.paletteTexture).rgb
-        })
-        
-        this.save('palette', material)
+        // Purple grade.
+        //
+        // Every world object samples this one palette, so the theme is applied
+        // here rather than by repainting the texture: it works for both the
+        // png and the compressed ktx, and stays tunable. The palette is mapped
+        // to a violet duotone by luminance, then a little of the original
+        // chroma is mixed back so materials remain distinguishable from each
+        // other rather than collapsing into one flat colour.
+        const colorNode = Fn(() =>
+        {
+            const base = texture(this.game.resources.paletteTexture).rgb
+            const duotone = mix(
+                color(Materials.PALETTE_SHADOW),
+                color(Materials.PALETTE_HIGHLIGHT),
+                luminance(base)
+            )
 
+            return mix(duotone, base, Materials.PALETTE_CHROMA_KEPT)
+        })()
+
+        const material = new MeshDefaultMaterial({ colorNode })
+
+        this.save('palette', material)
     }
 
     setGradient()
@@ -57,9 +80,9 @@ export class Materials
         const context = canvas.getContext('2d')
 
         const colors = [
-            { stop: 0, value: '#ffb646' },
-            { stop: 0.5, value: '#ff347e' },
-            { stop: 1, value: '#01005f' },
+            { stop: 0, value: '#d9a5ff' },
+            { stop: 0.5, value: '#8b3cff' },
+            { stop: 1, value: '#12003f' },
         ]
 
         const update = () =>
