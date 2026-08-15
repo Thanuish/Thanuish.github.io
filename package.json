@@ -7,7 +7,8 @@
     "dev": "vite --mode development",
     "build": "vite build --mode production",
     "preview": "vite preview",
-    "compress": "node scripts/compress.js static/"
+    "compress": "node scripts/compress.js static/",
+    "deploy": "node scripts/deploy.js"
   },
   "author": "",
   "license": "ISC",
