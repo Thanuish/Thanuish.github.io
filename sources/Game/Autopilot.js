@@ -63,24 +63,36 @@ export class Autopilot
 
         const destinations = this.chooser.element.querySelector('.js-travel-destinations')
 
+        // Inline styles rather than a class: something in the existing sheets
+        // wins on opacity, and this element only ever has two states, so it is
+        // not worth another specificity fight.
         this.chooser.show = () =>
         {
             this.chooser.element.classList.add('is-visible')
+            this.chooser.element.style.opacity = '1'
+            this.chooser.element.style.pointerEvents = 'auto'
+            this.chooser.element.style.transform = 'translateX(-50%) translateY(0)'
         }
 
         this.chooser.hide = () =>
         {
             this.chooser.element.classList.remove('is-visible')
+            this.chooser.element.style.opacity = '0'
+            this.chooser.element.style.pointerEvents = 'none'
+            this.chooser.element.style.transform = 'translateX(-50%) translateY(1rem)'
             destinations.classList.remove('is-visible')
+            destinations.style.display = 'none'
         }
 
         this.chooser.element.querySelector('.js-travel-manual').addEventListener('click', () =>
         {
+            this.hasChosen = true
             this.chooser.hide()
         })
 
         this.chooser.element.querySelector('.js-travel-dismiss').addEventListener('click', () =>
         {
+            this.hasChosen = true
             this.chooser.hide()
         })
 
@@ -97,6 +109,7 @@ export class Autopilot
                 button.textContent = destination.label
                 button.addEventListener('click', () =>
                 {
+                    this.hasChosen = true
                     this.driveTo(destination.name)
                     this.chooser.hide()
                 })
@@ -104,10 +117,21 @@ export class Autopilot
             }
 
             destinations.classList.add('is-visible')
+            destinations.style.display = 'flex'
         })
 
         // Give the intro time to finish before interrupting with a question.
-        this.game.ticker.wait(180, () => this.chooser.show())
+        // A plain timer rather than ticker.wait: that queue does not drain
+        // reliably here, so the prompt never appeared.
+        window.setTimeout(() => this.chooser.show(), 3000)
+
+        // Belt and braces: if that timer is throttled, the first frame the
+        // page is actually visible still brings the prompt up.
+        document.addEventListener('visibilitychange', () =>
+        {
+            if(!document.hidden && !this.hasChosen)
+                this.chooser.show()
+        })
     }
 
     /** Destinations the visitor can be driven to, resolved from the world. */
