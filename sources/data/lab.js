@@ -9,6 +9,7 @@ export default [
         title: 'CODERIZZ Coding Club',
         card: {
             accent: ACCENT,
+            image: 'awards/coderizz.jpg',
             kicker: 'Leadership',
             title: 'Founder & Technical Head',
             lines: [

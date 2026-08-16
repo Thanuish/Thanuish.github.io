@@ -56,7 +56,7 @@ function wrap(context, text, maxWidth)
 }
 
 /**
- * @param {{ kicker?: string, title: string, lines?: string[], chips?: string[], accent?: string }} card
+ * @param {{ kicker?: string, title: string, lines?: string[], chips?: string[], accent?: string, image?: string }} card
  */
 export function createProjectCardTexture(card)
 {
@@ -77,7 +77,12 @@ export function createProjectCardTexture(card)
     context.fillRect(0, 0, 8, HEIGHT)
 
     let y = PADDING
-    const contentWidth = WIDTH - PADDING * 2
+
+    // With an image the text takes the left column and the picture the right,
+    // so the wrap width has to shrink to match.
+    const hasImage = !!card.image
+    const imageWidth = hasImage ? Math.round(WIDTH * 0.4) : 0
+    const contentWidth = WIDTH - PADDING * 2 - (hasImage ? imageWidth + PADDING * 0.5 : 0)
 
     // Kicker
     if(card.kicker)
@@ -182,6 +187,40 @@ export function createProjectCardTexture(card)
 
             chipX += width + 10
         }
+    }
+
+    if(hasImage)
+    {
+        const image = new Image()
+
+        image.onload = () =>
+        {
+            const boxX = WIDTH - PADDING - imageWidth
+            const boxY = PADDING
+            const boxHeight = HEIGHT - PADDING * 2
+
+            // Contain, so a certificate is never cropped or stretched.
+            const scale = Math.min(imageWidth / image.width, boxHeight / image.height)
+            const drawWidth = image.width * scale
+            const drawHeight = image.height * scale
+
+            context.fillStyle = PANEL
+            roundRect(context, boxX, boxY, imageWidth, boxHeight, 12)
+            context.fill()
+
+            context.drawImage(
+                image,
+                boxX + (imageWidth - drawWidth) / 2,
+                boxY + (boxHeight - drawHeight) / 2,
+                drawWidth,
+                drawHeight
+            )
+
+            texture.needsUpdate = true
+        }
+
+        image.onerror = () => console.warn(`projectCard: could not load "${card.image}"`)
+        image.src = card.image
     }
 
     const texture = new THREE.CanvasTexture(canvas)
