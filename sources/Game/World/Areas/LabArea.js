@@ -880,10 +880,14 @@ export class LabArea extends Area
                         if(!project.imageMini)
                             return
 
-                        const loader = this.game.resourcesLoader.getLoader('textureKtx')
+                        // A thumbnail given as a path is a plain image loaded
+                        // as-is; a bare name still comes from the ktx set the
+                        // original shelves used.
+                        const isPath = project.imageMini.includes('/')
+                        const loader = this.game.resourcesLoader.getLoader(isPath ? 'texture' : 'textureKtx')
 
                         loader.load(
-                            `lab/images/${project.imageMini}`,
+                            isPath ? project.imageMini : `lab/images/${project.imageMini}`,
                             (loadedTexture) =>
                             {
                                 const alpha = uniform(0)
@@ -891,7 +895,7 @@ export class LabArea extends Area
                                 gsap.to(alpha, { value: 1, duration: 1, overwrite: true })
 
                                 loadedTexture.colorSpace = THREE.SRGBColorSpace
-                                loadedTexture.flipY = false
+                                loadedTexture.flipY = isPath
                                 loadedTexture.magFilter = THREE.LinearFilter
                                 loadedTexture.minFilter = THREE.LinearFilter
                                 loadedTexture.generateMipmaps = false

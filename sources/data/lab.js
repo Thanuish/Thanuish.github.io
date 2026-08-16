@@ -7,9 +7,9 @@ const ACCENT = '#a2ffab'
 export default [
     {
         title: 'CODERIZZ Coding Club',
+        imageMini: 'awards/coderizz.jpg',
         card: {
             accent: ACCENT,
-            image: 'awards/coderizz.jpg',
             kicker: 'Leadership',
             title: 'Founder & Technical Head',
             lines: [
