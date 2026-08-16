@@ -895,7 +895,7 @@ export class LabArea extends Area
                                 gsap.to(alpha, { value: 1, duration: 1, overwrite: true })
 
                                 loadedTexture.colorSpace = THREE.SRGBColorSpace
-                                loadedTexture.flipY = isPath
+                                loadedTexture.flipY = false
                                 loadedTexture.magFilter = THREE.LinearFilter
                                 loadedTexture.minFilter = THREE.LinearFilter
                                 loadedTexture.generateMipmaps = false
