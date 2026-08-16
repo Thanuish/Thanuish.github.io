@@ -1,151 +1,64 @@
-# Folio 2025
+# Thanuish Kumar Sathiaraj
 
-![image info](./static/social/share-image.png)
+An interactive portfolio you drive through, built as a research campus.
 
-## Setup
+**Live at [thanuish.github.io](https://thanuish.github.io/)**
 
-Create `.env` file based on `.env.example`
+M.Sc. Computer Science at the University of Stuttgart. AI, computer vision
+and 3D perception, with research experience at the Max Planck Institute for
+Intelligent Systems.
 
-Download and install [Node.js](https://nodejs.org/en/download/) then run this followed commands:
+## What is in the campus
 
-``` bash
-# Install dependencies
-npm install --force
+| Area | Contents |
+| --- | --- |
+| Landing | Name, disciplines, and where to go next |
+| Computer Vision Lab | Motion capture rig, scanning platform and a reconstructed body, one instrument per Max Planck workstream |
+| AI / LLM Lab | The Market Sentinel agent chain, with the approval gate drawn shut |
+| Projects | Nine projects, each opening a scrollable write-up |
+| Experience | Education and roles laid out along a timeline |
+| Contact | GitHub, LinkedIn, email and CV |
 
-# Serve at localhost:1234
+## Running it
+
+```bash
+npm install
 npm run dev
-
-# Build for production in the dist/ directory
-npm run build
 ```
 
-## Game loop
+Then open the address it prints.
 
-#### 0
+```bash
+npm run build     # production build into dist/
+npm run deploy    # build and publish to the gh-pages branch
+```
 
-- Time
-- Inputs
+## Editing the content
 
-#### 1
+Everything visitors read lives in `sources/data/` as plain data files, so
+adding a project or an award does not involve touching any 3D code.
 
-- Player:pre-physics (Inputs)
+| File | Controls |
+| --- | --- |
+| `projects.js` | Project boards and their detail pages |
+| `lab.js` | Achievements and awards |
+| `career.js` | Experience and education timeline |
+| `visionLab.js` | Computer vision lab instruments |
+| `aiLab.js` | AI lab pipeline nodes |
+| `social.js` | Contact links |
 
-#### 2
+## Credits
 
-- PhysicalVehicle:pre-physics (Player:pre-physics)
+The 3D engine is [folio-2025](https://github.com/brunosimon/folio-2025) by
+Bruno Simon, used under the MIT licence. The rendering, physics, vehicle,
+audio and world systems are his work. The campus built on top of it, its
+areas, interactions and content, is mine.
 
-#### 3
+Music by [Kounine](https://linktr.ee/Kounine), CC0.
+Built with [Three.js](https://threejs.org), [Rapier](https://rapier.rs) and
+[Vite](https://vite.dev).
 
-- Physics
+## Licence
 
-#### 4
-
-- PhysicsWireframe (Physics)
-- Objects (Physics)
-
-#### 5
-
-- PhysicalVehicle:post-physics (Player:pre-physics)
-
-#### 6
-
-- Player:post-physics (Physics, PhysicalVehicle:post-physics)
-
-#### 7
-
-- View (Inputs, Player:post-physics)
-
-#### 8
-
-- Intro
-- DayCycles
-- YearCycles
-- Weather (DayCycles, YearCycles)
-- Zones (Player:post-physics)
-- VisualVehicle (PhysicalVehicle:post-physics, Inputs, Player:post-physics, View)
-
-#### 9
-
-- Wind (Weather)
-- Lighting (DayCycles, View)
-- Tornado (DayCycles, PhysicalVehicle)
-- InteractivePoints (Player:post-physics)
-- Tracks (VisualVehicle)
-
-#### 10
-
-- Area++ (View, PhysicalVehicle:post-physics, Player:post-physics, Wind)
-- Foliage (VisualVehicle, View)
-- Fog (View)
-- Reveal (DayCycles)
-- Terrain (Tracks)
-- Trails (PhysicalVehicle)
-- Floor (View)
-- Grass (View, Wind)
-- Leaves (View, PhysicalVehicle)
-- Lightnings (View, Weather)
-- RainLines (View, Weather, Reveal)
-- Snow (View, Weather, Reveal, Tracks)
-- VisualTornado (Tornado)
-- WaterSurface (Weather, View)
-- Benches (Objects)
-- Bricks (Objects)
-- ExplosiveCrates (Objects)
-- Fences (Objects)
-- Lanterns (Objects)
-- Whispers (Player)
-
-#### 13
-
-- InstancedGroup (Objects, [SpecificObjects])
-
-#### 14
-
-- Audio (View, Objects)
-- Notifications
-- Title (PhysicalVehicle:post-physics)
-
-#### 998
-
-- Rendering
-
-#### 999
-
-- Monitoring
-
-## Blender
-
-### Export
-
-- Mute the palette texture node (loaded and set in Three.js `Material` directly)
-- Use corresponding export presets
-- Don't use compression (will be done later)
-
-### Compress
-
-Run `npm run compress`
-
-Will do the following
-
-#### GLB
-
-- Traverses the `static/` folder looking for glb files (ignoring already compressed files)
-- Compresses embeded texture with `etc1s --quality 255` (lossy, GPU friendly)
-- Generates new files to preserve originals
-
-#### Texture files
-
-- Traverses the `static/` folder looking for `png|jpg` files (ignoring non-model related folders)
-- Compresses with default preset to `--encode etc1s --qlevel 255` (lossy, GPU friendly) or specific preset according to path
-- Generates new files to preserve originals
-
-#### UI files
-
-- Traverses the `static/ui.` folder looking for `png|jpg` files
-- Compresses to WebP
-
-#### Resources
-
-- https://gltf-transform.dev/cli
-- https://github.com/KhronosGroup/KTX-Software?tab=readme-ov-file
-- https://github.khronos.org/KTX-Software/ktxtools/toktx.html
+MIT. See [license.md](license.md), which retains the original copyright
+notice as the licence requires.
