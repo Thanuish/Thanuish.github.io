@@ -203,20 +203,46 @@ export default [
         ]
     },
     {
-        title: 'LLM Token Optimisation',
-        titleSmall: [ 'Token', 'Optimisation' ],
+        title: 'LLM Cost Router',
+        titleSmall: [ 'LLM Cost', 'Router' ],
         attributes: { role: 'Personal project' },
         distinctions: [],
         cards: [
             {
                 accent: ACCENT_AI,
-                kicker: 'Placeholder',
-                title: 'LLM token optimisation',
+                kicker: 'The idea in one line',
+                title: "Don't call a model if you don't have to",
                 lines: [
-                    'This board is a placeholder. The project is real but its details are not in my master profile yet, so nothing has been written here.',
-                    'Tell me what it does, what it is built with and what it measurably achieved, and this fills in.'
+                    "And if you must, use the cheapest model that can actually do the job, then measure whether that decision was right.",
+                    'Runs entirely locally on Ollama, so there is no API spend at all.'
                 ],
-                chips: [ 'To be written' ]
+                chips: [ 'FastAPI', 'Pydantic v2', 'Ollama', 'Docker Compose' ]
+            },
+            {
+                accent: ACCENT_AI,
+                kicker: 'The decision hierarchy',
+                title: 'Every request falls through six stages',
+                lines: [
+                    'Semantic cache: embed the question and search Valkey for a similar past one. A hit returns the cached answer with zero model calls.',
+                    'Knowledge base: if deterministic FAQ or product data answers it, still zero model calls.',
+                    'Only now is a model needed. A scikit-learn classifier scores the request Simple, Moderate or Complex.',
+                    'Route to the cheapest sufficient local model for that tier: Llama 3.2 1B, Gemma 3, or Qwen 2.5 7B.',
+                    'Verify asynchronously: a stronger model re-scores the cheap answer.',
+                    'Escalate on failure, and log that failure as training data for the classifier.'
+                ],
+                chips: [ 'Semantic cache', 'RandomForest', 'Tiered routing', 'Quality verification' ]
+            },
+            {
+                accent: ACCENT_AI,
+                kicker: 'Stack',
+                title: 'Local, measured, containerised',
+                lines: [
+                    'Valkey for the cache, Sentence-Transformers all-MiniLM-L6-v2 for embeddings, both local.',
+                    'PostgreSQL for request history and routing outcomes.',
+                    'Streamlit, Pandas and Plotly dashboard to see whether the cheap route was the right call.',
+                    'Docker Compose brings up api, valkey, postgres, ollama, dashboard and worker together.'
+                ],
+                chips: [ 'Valkey', 'Sentence-Transformers', 'PostgreSQL', 'Streamlit', 'Plotly' ]
             }
         ]
     },

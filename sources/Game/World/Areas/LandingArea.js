@@ -15,6 +15,9 @@ export class LandingArea extends Area
     static LETTER_SPACING = 0.16
     static ACCENT_COLOR = '#5fd2ff'
 
+    // How long a letter lies knocked over before standing itself back up.
+    static LETTER_RECOVERY_SECONDS = 5
+
     // Kept to plain ASCII on purpose: the extruded typeface has no glyph for
     // typographic separators like the middle dot.
     // Sized against the 1.45-unit name letters below them. The first pass was
@@ -179,34 +182,27 @@ export class LandingArea extends Area
     }
 
     /**
-     * A hint painted on the paving by the spawn, plus the keyboard prop moved
-     * alongside it.
+     * The arrow-key hint.
      *
-     * This replaces the fingerpost that used to stand here. Its arms pointed at
-     * real coordinates but read as wrong from the ground, and a first-time
-     * visitor needs to know which keys move the car far more than they need a
-     * compass.
+     * This was text painted on the paving, which sat at a glancing angle and
+     * was effectively unreadable. It is HTML now: a glowing key cluster that is
+     * legible at any camera angle and on any screen, and which fades out the
+     * moment the visitor actually drives.
      */
     setGroundHint()
     {
-        const origin = LandingArea.HINT_POSITION
+        const element = document.querySelector('.js-controls-hint')
 
-        const mesh = createTextPlane('PRESS THE ARROW KEYS TO DRIVE', {
-            hex: LandingArea.ACCENT_COLOR,
-            worldWidth: 9,
-            worldHeight: 1.4,
-            fontSize: 0.85,
-            density: 140,
-            intensity: 1.5
-        })
+        if(!element)
+            return
 
-        // Laid into the paving, turned to face the way the car starts out.
-        mesh.rotation.x = - Math.PI / 2
-        mesh.rotation.z = - LandingArea.HINT_ROTATION
-        mesh.position.set(origin.x, 0.03, origin.z)
+        const dismiss = () =>
+        {
+            element.classList.add('is-hidden')
+        }
 
-        this.game.scene.add(mesh)
-        this.objects.hideable.push(mesh)
+        for(const action of [ 'forward', 'backward', 'left', 'right' ])
+            this.game.inputs.events.on(action, (event) => { if(event.active) dismiss() })
     }
 
     setKiosk()
@@ -444,6 +440,48 @@ export class LandingArea extends Area
         }
     }
 
+    /**
+     * Stands a knocked-over letter back up once it has come to rest.
+     *
+     * Waiting for the area to be left was not enough: the name stays flattened
+     * while the visitor is still standing in front of it, which is exactly when
+     * it matters. A letter that is tilted and asleep is reset after a pause,
+     * so hitting them is still fun but the name always recovers.
+     */
+    updateFallenLetters()
+    {
+        this.fallenTimers = this.fallenTimers ?? new Map()
+
+        const upright = new THREE.Vector3(0, 1, 0)
+
+        for(const reference of this.references.items.get('letters'))
+        {
+            const object = reference.userData.object
+            const body = object?.physical?.body
+
+            if(!body || !body.isEnabled() || object.reseting)
+                continue
+
+            upright.set(0, 1, 0).applyQuaternion(body.rotation())
+            const isFallen = upright.y < 0.7
+
+            if(!isFallen || !body.isSleeping())
+            {
+                this.fallenTimers.delete(reference)
+                continue
+            }
+
+            const elapsed = (this.fallenTimers.get(reference) ?? 0) + this.game.ticker.deltaScaled
+            this.fallenTimers.set(reference, elapsed)
+
+            if(elapsed > LandingArea.LETTER_RECOVERY_SECONDS)
+            {
+                this.game.objects.resetObject(object)
+                this.fallenTimers.delete(reference)
+            }
+        }
+    }
+
     setAchievement()
     {
         this.events.on('boundingIn', () =>
@@ -464,6 +502,7 @@ export class LandingArea extends Area
     update()
     {
         this.faceCamera(this.signboardMeshes)
+        this.updateFallenLetters()
 
         this.localTime.value += this.game.ticker.deltaScaled * 0.1
     }
