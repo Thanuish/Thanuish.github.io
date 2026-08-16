@@ -20,6 +20,7 @@ export default [
     },
     {
         title: 'SRM Project Expo 2022',
+        imageMini: 'awards/srm-2022.jpg',
         card: {
             accent: ACCENT,
             kicker: 'First place  ·  2022',
@@ -32,6 +33,7 @@ export default [
     },
     {
         title: 'Saveetha Project Expo 2023',
+        imageMini: 'awards/saveetha-2023.jpg',
         card: {
             accent: ACCENT,
             kicker: 'First place  ·  2023',
@@ -44,6 +46,7 @@ export default [
     },
     {
         title: 'SRM Hackathon 2023',
+        imageMini: 'awards/hackathon-2023.jpg',
         card: {
             accent: ACCENT,
             kicker: 'Runner-up  ·  2023',
@@ -56,6 +59,7 @@ export default [
     },
     {
         title: 'Computer Society of India',
+        imageMini: 'awards/csi.jpg',
         card: {
             accent: ACCENT,
             kicker: 'Leadership',
